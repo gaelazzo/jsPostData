@@ -1,0 +1,49 @@
+{
+  "name": "jsPostData",
+  "version": "1.0.1",
+  "description": "Query functions convertable into sql expressions",
+  "main": "src/jsPostData.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "lodash": "~3.1.0",
+    "JQDeferred": "^2.1.0",
+    "async": "~1.4.0",
+    "jsDataSet": "git://github.com/gaelazzo/jsDataSet.git",
+    "jsMultiSelect": "git://github.com/gaelazzo/jsMultiSelect",
+    "jsDataAccess": "git://github.com/gaelazzo/jsDataAccess",
+    "jsDbList": "git://github.com/gaelazzo/jsDbList.git",
+    "jsDataQuery": "git://github.com/gaelazzo/jsDataQuery.git",
+    "jsSqlServerDriver":"git://github.com/gaelazzo/jsSqlServerDriver.git"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-contrib-yuidoc": "^0.7.0",
+    "jasmine-core": "^2.2.0",
+    "jasmine-node": "2.0.0-beta4",
+    "grunt-jasmine-node-new": "^0.3.2",
+    "jasmine-collection-matchers":"*",
+    "load-grunt-tasks": "^3.1.0",
+    "time-grunt": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gaelazzo/jsPostData"
+  },
+  "keywords": [
+    "Save data",
+    "DataSet",
+    "DataBase",
+    "Business Rules",
+    "SQL",
+    "Security"
+  ],
+  "author": "Gaetano Lazzo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gaelazzo/jsPostData/issues"
+  },
+  "homepage": "https://github.com/gaelazzo/jsPostData#readme"
+}
