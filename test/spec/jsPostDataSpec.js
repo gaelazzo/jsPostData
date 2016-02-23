@@ -8,7 +8,7 @@ var PostData = require('../../src/jsPostData').PostData,
     dsNameSpace = require('jsDataSet'),
     dq = require('jsDataQuery'),
     DA = require('jsDataAccess'),
-    Deferred = require("JQDeferred"),
+    Deferred = require("jsDeferred"),
     Environment = require('../fakeEnvironment'),
     dbList = require('jsDbList'),
     dataRowState = dsNameSpace.dataRowState,
@@ -1360,7 +1360,7 @@ describe('PostData', function () {
                     .fail(function (err) {
                         expect(err).toBeUndefined();
                     })
-                    .always(function (res) {
+                    .always(function () {
                         //console.log(res);
                         expect(DAC.commit).toHaveBeenCalled();
                         expect(DAC.close).toHaveBeenCalled();
@@ -1511,7 +1511,7 @@ describe('PostData', function () {
             dbList.getDataAccess('test')
                 .done(function (DA) {
                     DAC = DA;
-                    conn = DA.myConn;
+                    conn = DA.sqlConn;
                     postData = new PostData(DAC, env);
                     changes = postData.changeList(d);
                     done();
@@ -1822,7 +1822,7 @@ describe('PostData', function () {
             dbList.getDataAccess('test')
                 .done(function (c) {
                     DAC = c;
-                    conn = c.myConn;
+                    conn = c.sqlConn;
                     postData = new PostData(DAC, env);
                     changes = postData.changeList(d);
                     done();

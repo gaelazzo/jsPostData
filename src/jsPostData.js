@@ -1,22 +1,36 @@
- /**
+/*globals promise sqlFun Environment rollBack reject Deferred promise fail resolve done progress notify Context */
+
+/**
  * Manages data storing
  * @module PostData
  */
 'use strict';
 
-var dsSpace = require('jsDataSet'),
-  DataSet = dsSpace.DataSet,
-  DataRow = dsSpace.DataRow,
-  DataTable = dsSpace.DataTable,
+var dsSpace = require('jsDataSet');
+var DataSet = dsSpace.DataSet;
 
-  jsMultiSelect = require('jsMultiSelect'),
-  DataAccess = require('jsDataAccess').DataAccess,
-  Select = jsMultiSelect.Select,
-  isolationLevels= require('jsDataAccess').isolationLevels,
-  dataRowState = dsSpace.dataRowState,
-  _ = require('lodash'),
-  Deferred = require("JQDeferred"),
-  async = require('async');
+/**
+ * @type {DataRow}
+ */
+var  DataRow = dsSpace.DataRow;
+
+var DataTable = dsSpace.DataTable;
+
+var  jsMultiSelect = require('jsMultiSelect');
+var   DataAccess = require('jsDataAccess').DataAccess;
+var   Select = jsMultiSelect.Select;
+var  isolationLevels= require('jsDataAccess').isolationLevels;
+var  dataRowState = dsSpace.dataRowState;
+
+var  _ = require('lodash');
+
+/**
+ *
+ * @type Deferred
+ */
+  var Deferred = require("jsDeferred");
+
+  var async = require('async');
 
 /**
  * Manages a cache of select max done in a transaction
@@ -63,7 +77,7 @@ MaxCacher.prototype.getHash = function(table, column,filter,expr){
  *  If there is no selector, then the result can be taken from cache if a query with same parameters has already
  *   be done.
  * @method getMax
- * @param {DataRow} r DataRow for which evaluate the max
+ * @param {ObjectRow} r objectRow for which evaluate the max
  * @param {string} column  column to evaluate
  * @param {string[]} selectors //selector fields for the calculation
  * @param {sqlFun} filter //filter to apply
@@ -119,6 +133,14 @@ MaxCacher.prototype.getMax = function (r, column, selectors, filter, expr) {
   return def.promise();
 };
 
+/**
+ *
+ * @param {ObjectRow} r
+ * @param {string} column
+ * @param {sqlFun} filter
+ * @param {sqlFun} expr
+ * @param {object} value
+ */
 MaxCacher.prototype.setMax = function (r, column, filter, expr, value) {
   this.allMax[this.getHash(r.getRow().table.name, column, filter, expr)] = value;
 };
@@ -136,7 +158,7 @@ function PostData(conn, environment){
   this.conn= conn;
   this.environment = environment;
   if (conn) {
-    this.sqlConn = conn.myConn;
+    this.sqlConn = conn.sqlConn;
   }
 }
 
@@ -224,7 +246,7 @@ PostData.prototype.checkIsNotParent = function(ds, tableName, allowedChilds) {
  * Returns modified rows of given tables filtering by rowState
  * @method getTableOps
  * @param {DataTable[]} tables
- * @param {dataRowState|string} rowState
+ * @param {DataRowState|string} rowState
  */
 function getTableOps(tables, rowState) {
   return _.reduce(tables, function (list, t) {
@@ -261,12 +283,16 @@ PostData.prototype.changeList = function(original) {
   ));
 };
 
+
 function defaultCallChecks(post){
-  var def =  Deferred(),
-    res = {checks:[], shouldContinue:true};
+  var def =  Deferred();
+
+  var res = {checks:[], shouldContinue:true};
   def.resolve(res);
   return def.promise();
 }
+
+
 function defaultAddError(msg) {
   return {msg:msg};
 }
@@ -276,7 +302,7 @@ function defaultAddError(msg) {
  * Saves a dataSet and return empty list if successful or a list of messages if they have to be verified before
  *  effectively committing changes.
  * @method doPost
- * @param {object[]} changedRows
+ * @param {ObjectRow[]} changedRows
  * @param {object} options
  * @param {function} options.getChecks : function(post) this function, when provided, is called before and after
  *  applying changes to db. The first time is called with post=false and the second time with post=true.
@@ -288,31 +314,37 @@ function defaultAddError(msg) {
  *  @param   {string} [options.isolationLevel = DataAccess.isolationLevels.readCommitted]
  *  @param {function} [options.log]  function called with a DataAccess and changedRows as parameters in order to do eventual
  *   db transaction logging
- *  @param {function} [options.doUpdate] function called with a DataAccess and changedRows in order to do eventual additionally
+ * @param {function} [options.doUpdate] function called with a DataAccess and changedRows in order to do eventual additionally
  *   updates when it's sure the transaction is to be committed, i.e., no check have been raised. This function must
  *    return an array of checks. If it is empty the transaction is committed otherwise is rollbacked
- *   @param {OptimisticLocking} [options.optimisticLocking]
+ * @param {OptimisticLocking} [options.optimisticLocking]
  * @return {object}   {checks:ProcedureMessage[], data:DataSet}
  */
 PostData.prototype.doPost = function(changedRows, options) {
   var opt = options || {},
-    checks =[],
-    that=this,
-    opened= false,
-    tranOpen= false,
-    terminated = false,
-    result = {checks: checks};
-  var def =  Deferred();
-  _.defaults(opt, {getChecks: defaultCallChecks,
+      checks = [],
+      that = this,
+      opened = false,
+      tranOpen = false,
+      terminated = false,
+      result = {checks: checks};
+  /**
+   * @var def
+   * @type Deferred
+   */
+  var def = Deferred();
+  _.defaults(opt, {
+    getChecks: defaultCallChecks,
     getError: defaultAddError,
-    isolationLevel: isolationLevels.readCommitted});
+    isolationLevel: isolationLevels.readCommitted
+  });
 
-  function appendArray(array1,array2){
+  function appendArray(array1, array2) {
     array1.push.apply(array1, array2);
   }
 
-  if (changedRows.length===0){
-    def.resolve({checks:[]}); //default response on unchanged dataset
+  if (changedRows.length === 0) {
+    def.resolve({checks: []}); //default response on unchanged dataset
     return def.promise();
   }
   // Resets all evaluated cached max
@@ -320,41 +352,43 @@ PostData.prototype.doPost = function(changedRows, options) {
 
   /**
    * Adds an error message to output result
+   * @method @dbError
    * @param msg
    */
-  function dbError(msg){
+  function dbError(msg) {
     checks.push(opt.getError(msg));
   }
 
   /**
    * Resolve the promise with result, and do the necessary cleanup: rollback transaction if a transaction is open,
    *  and close connection if the connection is open. If further errors arise, add them to checks as dbErrors
+   * @method resolve
    * @returns {Deferred}
    */
-  function resolve(){
+  function resolve() {
     terminated = true;
-    if (tranOpen){
+    if (tranOpen) {
       that.conn.rollback()
-        .then(function (){
-          return that.conn.close();
-        })
-        .then(function (){
-          def.resolve(result);
-        })
-        .fail(function(err){
-          that.conn.close()
-            .done(function(){
-            dbError(err);
+          .then(function () {
+            return that.conn.close();
+          })
+          .then(function () {
             def.resolve(result);
           })
-        });
-      return  def.promise();
+          .fail(function (err) {
+            that.conn.close()
+                .done(function () {
+                  dbError(err);
+                  def.resolve(result);
+                })
+          });
+      return def.promise();
     }
-    if (opened){
+    if (opened) {
       that.conn.close()
-        .done(function(){
-          def.resolve(result);
-        });
+          .done(function () {
+            def.resolve(result);
+          });
     } else {
       def.resolve(result);
     }
@@ -364,78 +398,97 @@ PostData.prototype.doPost = function(changedRows, options) {
 
   // CALL PRE - CHECKS
   opt.getChecks(false)
-    .then(function(preChecks) {
-      appendArray(checks,preChecks.checks);
-      if (preChecks.shouldContinue === false) {
-        return resolve();
-      }
-      //open connection
-      return that.conn.open();
-    })
-    .then(function() {
-      if (terminated) {
-        return def;}
-      opened = true;
-      //begin transaction
-      return that.conn.beginTransaction(opt.isolationLevel);
-    })
-    .then(function(){
-      if (terminated) {
-        return def;}
-      tranOpen = true;
-      return that.physicalPostBatch(changedRows, opt.optimisticLocking);
-    })
-    .then(function(){
-      if (terminated) {
-        return def;}
-      if (opt.log){ //optional transaction log
-        return opt.log(that.conn, changedRows);
-      }
-      return  Deferred().resolve(true).promise();
+      .then(function (preChecks) {
+        appendArray(checks, preChecks.checks);
+        if (preChecks.shouldContinue === false) {
+          return resolve();
+        }
+        //open connection
+        return that.conn.open();
       })
-    .then(function(){
-      if (terminated) {return def;}
-      //CALL POST-CHECK
-      return opt.getChecks(true);
-    })
-    .then(function(postChecks){
-      if (terminated) {return def;}
-      appendArray(checks, postChecks.checks);
-      if (checks.length > 0){
-        return resolve(); //forces a rollback
-      }
-      if (opt.doUpdate){ //optional external post-updating
-        return opt.doUpdate(that.conn, changedRows);
-      }
-      return  Deferred().resolve([]).promise();
-    })
-    .then(function(extChecks){
-      if (terminated) {return def;}
-      appendArray(checks, extChecks.checks);
-      if (checks.length > 0) {
-        return resolve(); //forces a rollback
-      }
-      //all is fine so we can do a commit
-      return that.conn.commit();
-    })
-    .then(function(res){
-      if (terminated) {return def;}
-      tranOpen = false;
-      _.forEach(changedRows, function (r) {
-        r.getRow().acceptChanges();
+      .then(function () {
+        if (terminated) {
+          return def;
+        }
+        opened = true;
+        //begin transaction
+        return that.conn.beginTransaction(opt.isolationLevel);
+      })
+      .then(function () {
+        if (terminated) {
+          return def;
+        }
+        tranOpen = true;
+        return that.physicalPostBatch(changedRows, opt.optimisticLocking);
+      })
+      .then(function () {
+        if (terminated) {
+          return def;
+        }
+        if (opt.log) { //optional transaction log
+          return opt.log(that.conn, changedRows);
+        }
+        return Deferred().resolve(true).promise();
+      })
+      .then(function () {
+        if (terminated) {
+          return def;
+        }
+        //CALL POST-CHECK
+        return opt.getChecks(true);
+      })
+      .then(function (postChecks) {
+        if (terminated) {
+          return def;
+        }
+        appendArray(checks, postChecks.checks);
+        if (checks.length > 0) {
+          return resolve(); //forces a rollback
+        }
+        if (opt.doUpdate) { //optional external post-updating
+          return opt.doUpdate(that.conn, changedRows);
+        }
+        return Deferred().resolve([]).promise();
+      })
+      .then(function (extChecks) {
+        if (terminated) {
+          return def;
+        }
+        appendArray(checks, extChecks.checks);
+        if (checks.length > 0) {
+          return resolve(); //forces a rollback
+        }
+        //all is fine so we can do a commit
+        return that.conn.commit();
+      })
+      .then(function (res) {
+        if (terminated) {
+          return def;
+        }
+        tranOpen = false;
+        _.forEach(changedRows,
+            /**
+             * @param {ObjectRow} r
+             */
+            function (r) {
+          r.getRow().acceptChanges();
+        });
+        return that.reselectAllViews(_.filter(changedRows, function (r) {
+          return r.getRow !== undefined;
+        }));
+      })
+      .then(function () {
+        if (terminated) {
+          return def;
+        }
+        result.data = changedRows;
+        resolve(); //closes connection and returns data
+      })
+      //any fail should reach here
+      .fail(function (err) {
+        dbError(err);
+        resolve();
       });
-      return that.reselectAllViews(_.filter(changedRows,function(r){return r.getRow !== undefined;}));
-    })
-    .then(function(){
-      if (terminated) {return def;}
-      result.data = changedRows;
-      resolve(); //closes connection and returns data
-    })
-    //any fail should reach here
-  .fail(function (err) {
-    dbError(err);
-    resolve();
-  });
 
   return def.promise();
 };
@@ -446,7 +499,7 @@ PostData.prototype.doPost = function(changedRows, options) {
  *  consider them.
  * @method  getSelectAllViews
  * @private
- * @param {DataRow[]} changedRows
+ * @param {ObjectRow[]} changedRows
  * @returns {Select []}
  */
 PostData.prototype.getSelectAllViews = function (changedRows) {
@@ -506,20 +559,12 @@ function promiseParallel(tasks) {
   }));
 }
 
-/**
- * Calcs an auto increment value for a column
- * @param conn
- * @param r
- * @param autoIncrementProperty
- */
-function tryToGetValue(conn, r, autoIncrementProperty){
 
-}
 
 /**
  * Calculates an autoincrement column checking that there is no other rows with that key in table
  * @method calcAutoId
- * @param {DataRow} r
+ * @param {ObjectRow} r
  * @param {AutoIncrementColumn} autoIncrementProperty ({DataRow} r, {string} columnName, {DataAccess} conn}
  * @return {promise} //resolves false if customFunction was found, true otherwise
  */
@@ -554,7 +599,7 @@ PostData.prototype.calcAutoId = function(r, autoIncrementProperty) {
       that.maxCacher.setMax(r, field, selector, fieldExpr, newID);
       if (! autoIncrementProperty.isNumber){
         newID = newID.toString();
-        while (newID.length < autoIncrementProperty.idSize) {
+        while (newID.length < autoIncrementProperty.idLen) {
           newID = '0' + newID;
         }
         newID = prefix + newID;
@@ -567,7 +612,7 @@ PostData.prototype.calcAutoId = function(r, autoIncrementProperty) {
 
 /**
  * Calculates all autoincrement property of a DataRow r
- * @param {DataRow} r
+ * @param {ObjectRow} r
  * @returns {promise} return true if NO custom autoincrement was found
  */
 PostData.prototype.calcAllAutoId = function(r) {
@@ -600,12 +645,8 @@ PostData.prototype.calcAllAutoId = function(r) {
   var def =  Deferred(),
     that=this,
     internalIndex = 0,
-    sqlPacket = [], //array of { {DataRow[]}rows, {string} sql} },
     rows = [],
     sql,
-    index = 0,
-    currRow,
-    totRows = changedRows.length,
     failed= false;
 
    function sqlMerge(preparedRow, hasCustomAutoincrement){
@@ -663,7 +704,7 @@ PostData.prototype.sqlSizeLimit = 4000;
  /**
   * Reads again a row from db
   * @method reselect
-  * @param {DataRow} row
+  * @param {ObjectRow} row
   * @returns {*}
   */
  PostData.prototype.reselect = function(row) {
@@ -680,7 +721,7 @@ PostData.prototype.sqlSizeLimit = 4000;
  /**
   * Runs a sequence of db commands in order to save an array of rows
   * @method physicalPostBatch
-  * @param {DataRow[]}changedRows
+  * @param {ObjectRow[]}changedRows
   * @param {OptimisticLocking} optimisticLocking
   * @returns {*} Resolved promise if all ok, rejected promise if errors
   */
