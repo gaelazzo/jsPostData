@@ -1,15 +1,18 @@
 /*globals describe, beforeEach,it,expect,jasmine,spyOn */
-;
-'use strict';
 
+/*jshint -W069 */
 
 var PostData = require('../../src/jsPostData').PostData,
     MaxCacher = require('../../src/jsPostData').MaxCacher,
     dsNameSpace = require('jsDataSet'),
     dq = require('jsDataQuery'),
-    DA = require('jsDataAccess'),
-    Deferred = require("jsDeferred"),
-    Environment = require('../fakeEnvironment'),
+    DA = require('jsDataAccess');
+/**
+ *
+ * @type {Deferred}
+ */
+var    Deferred = require("jsDeferred");
+var    Environment = require('../fakeEnvironment'),
     dbList = require('jsDbList'),
     dataRowState = dsNameSpace.dataRowState,
     DataSet = dsNameSpace.DataSet,
@@ -88,6 +91,7 @@ describe('setup dataBase', function () {
 });
 
 describe('PostData', function () {
+'use strict';
     var DAC, env;
 
 
@@ -597,7 +601,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toBeUndefined();
                     done();
-                })
+                });
         });
 
         it('getMax should not call conn.readSingleValue null when there is no selector the 2th time is called',
@@ -633,7 +637,7 @@ describe('PostData', function () {
                     .fail(function (err) {
                         expect(err).toBeUndefined();
                         done();
-                    })
+                    });
             });
 
         it('getMax should call conn.readSingleValue  when there is selector but parent not added', function (done) {
@@ -664,7 +668,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toBeUndefined();
                     done();
-                })
+                });
         });
 
         it('getMax SHOULD call relation.getParents  when there is selector but parent not added', function (done) {
@@ -696,7 +700,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toBeUndefined();
                     done();
-                })
+                });
         });
 
         it('getMax SHOULD NOT call relation.getParents  when there is selector but parent not added - 2th call in a row',
@@ -732,12 +736,12 @@ describe('PostData', function () {
                             .fail(function (err) {
                                 expect(err).toBeUndefined();
                                 done();
-                            })
+                            });
                     })
                     .fail(function (err) {
                         expect(err).toBeUndefined();
                         done();
-                    })
+                    });
             });
 
 
@@ -774,7 +778,7 @@ describe('PostData', function () {
                     .fail(function (err) {
                         expect(err).toBeUndefined();
                         done();
-                    })
+                    });
             });
 
 
@@ -811,7 +815,7 @@ describe('PostData', function () {
                     .fail(function (err) {
                         expect(err).toBeUndefined();
                         done();
-                    })
+                    });
             });
 
         it('getMax SHOULD call conn.readSingleValue  when there is selector and parent ' +
@@ -848,7 +852,7 @@ describe('PostData', function () {
                     .fail(function (err) {
                         expect(err).toBeUndefined();
                         done();
-                    })
+                    });
             });
     });
 
@@ -918,7 +922,7 @@ describe('PostData', function () {
                 })
                 .fail(function (err) {
                     expect(err).toBeUndefined();
-                })
+                });
         });
 
         it('should call opt.callChecks when there is something to save', function (done) {
@@ -1542,7 +1546,7 @@ describe('PostData', function () {
                     expect(postData.calcAllAutoId).toHaveBeenCalled();
                     expect(postData.calcAllAutoId.callCount).toBe(changes.length);
                     done();
-                })
+                });
         });
 
         it('should call calcAllAutoId one at a time', function (done) {
@@ -1571,7 +1575,7 @@ describe('PostData', function () {
                     expect(postData.calcAllAutoId.callCount).toBe(changes.length);
                     expect(overlap).toBeFalsy();
                     done();
-                })
+                });
         });
 
         it('if calcAllAutoId one does fail, should reject request and stop', function (done) {
@@ -1581,7 +1585,7 @@ describe('PostData', function () {
                     overlap = true;
                 }
                 var def = Deferred();
-                if (nRows == 5) {
+                if (nRows === 5) {
                     def.reject('some reasons');
                     return def.promise();
                 }
@@ -1609,7 +1613,7 @@ describe('PostData', function () {
                     expect(postData.calcAllAutoId.callCount).toBe(6);
                     expect(overlap).toBeFalsy();
                     done();
-                })
+                });
         });
 
 
@@ -1637,7 +1641,7 @@ describe('PostData', function () {
                     expect(conn.giveErrorNumberDataWasNotWritten).toHaveBeenCalled();
                     expect(conn.giveErrorNumberDataWasNotWritten.callCount).toBe(changes.length);
                     done();
-                })
+                });
         });
 
         it('should call appendCommands for every given row ', function (done) {
@@ -1675,7 +1679,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toBeUndefined();
                     done();
-                })
+                });
         });
 
         it('should call appendCommands for every given row  (all single sql commands)', function (done) {
@@ -1724,7 +1728,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toBeUndefined();
                     done();
-                })
+                });
         });
 
         it('should call appendCommands for every given row (grouped sql commands)', function (done) {
@@ -1773,7 +1777,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toBeUndefined();
                     done();
-                })
+                });
         });
 
     });
@@ -1844,10 +1848,10 @@ describe('PostData', function () {
                 return def.promise();
             });
             postData.physicalPostBatch(changes, optimisticLocking)
-                .done(function (res) {
+                .done(function () {
                     expect(postData.getSqlStatements).toHaveBeenCalled();
                     done();
-                })
+                });
         });
 
         it('should call runCmd', function (done) {
@@ -1857,7 +1861,7 @@ describe('PostData', function () {
                 return def.promise();
             });
             postData.physicalPostBatch(changes, optimisticLocking)
-                .done(function (res) {
+                .done(function () {
                     expect(DAC.runCmd).toHaveBeenCalled();
                     done();
                 });
@@ -1893,7 +1897,7 @@ describe('PostData', function () {
                 if (nOk < 50) {
                     def.resolve(-1);
                 } else {
-                    def.reject('runCmd fake error')
+                    def.reject('runCmd fake error');
                 }
 
                 return def.promise();
@@ -1906,7 +1910,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toContain('runCmd fake error');
                     done();
-                })
+                });
         });
 
 
@@ -1945,14 +1949,14 @@ describe('PostData', function () {
                 return def.promise();
             });
             postData.physicalPostBatch(changes, optimisticLocking)
-                .done(function (res) {
+                .done(function () {
                     expect(true).toBeFalsy();
                     done();
                 })
                 .fail(function (err) {
                     expect(err).toContain('internal error');
                     done();
-                })
+                });
         });
 
 
@@ -1987,7 +1991,7 @@ describe('PostData', function () {
                 return def.promise();
             });
             postData.physicalPostBatch(changes, optimisticLocking)
-                .done(function (res) {
+                .done(function () {
                     _.forEach(expectedSql, function (sql) {
                         expect(_.find(runnedSql, function (el) {
                             //console.log(el);
@@ -1999,7 +2003,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toBeUndefined();
                     done();
-                })
+                });
         });
 
         it('runCmd should be called with every sql cmd got from getPostCommand (single)', function (done) {
@@ -2007,7 +2011,7 @@ describe('PostData', function () {
             var countCommands = 0;
             var expectedSql = [],
                 runnedSql = [];
-            spyOn(DAC, 'getPostCommand').andCallFake(function (row, locking, env) {
+            spyOn(DAC, 'getPostCommand').andCallFake(function () {  //row, locking, env
                 countCommands += 1;
                 var sql = 'fake sql >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' + countCommands;
                 expectedSql.push(sql);
@@ -2045,7 +2049,7 @@ describe('PostData', function () {
                 .fail(function (err) {
                     expect(err).toBeUndefined();
                     done();
-                })
+                });
         });
 
     });
@@ -2129,13 +2133,14 @@ describe('PostData', function () {
             d.tables.tab3.tableForWriting('realtable3');
             expect(postData.getSelectAllViews(changes)[0].tableName).toEqual('tab3');
         });
-    })
+    });
 
 });
 
 
 
 describe('destroy dataBase', function () {
+'use strict';
     var sqlConn;
     beforeEach(function (done) {
         dbList.setDbInfo('test', good);

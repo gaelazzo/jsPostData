@@ -648,6 +648,11 @@ PostData.prototype.calcAllAutoId = function(r) {
     sql,
     failed= false;
 
+   /**
+    *
+    * @param {ObjectRow} preparedRow
+    * @param {boolean} hasCustomAutoincrement
+      */
    function sqlMerge(preparedRow, hasCustomAutoincrement){
      if (failed){
        return;
