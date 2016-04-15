@@ -34,9 +34,18 @@ var    Environment = require('../fakeEnvironment'),
  *  }
  */
 //PUT THE  FILENAME OF YOUR FILE HERE:
-var configName = 'D:/gitrepo/jsPostData/test/db.json';
 
-var dbConfig = JSON.parse(fs.readFileSync(configName).toString());
+var configName = path.join('test', 'db.json');
+if (process.env.TRAVIS){
+    dbConfig = { "server": "127.0.0.1",
+        "dbName": "test",
+        "user": "root",
+        "pwd": ""
+    };
+}
+else {
+    dbConfig = JSON.parse(fs.readFileSync(configName).toString());
+}
 
 /**
  * setup the dbList module
@@ -53,7 +62,7 @@ var good = {
     user: dbConfig.user,
     pwd: dbConfig.pwd,
     database: dbConfig.dbName,
-    sqlModule: 'jsSqlServerDriver'
+    sqlModule: 'jsMySqlDriver'
 };
 
 
@@ -77,7 +86,7 @@ describe('setup dataBase', function () {
 
 
     it('should run the setup script', function (done) {
-        sqlConn.run(fs.readFileSync('test/setup.sql').toString())
+        sqlConn.run(fs.readFileSync(path.join('test', 'setup.sql')).toString())
             .done(function () {
                 expect(true).toBeTruthy();
                 done();
@@ -2163,7 +2172,7 @@ describe('destroy dataBase', function () {
     });
 
     it('should run the destroy script', function (done) {
-        sqlConn.run(fs.readFileSync('test/destroy.sql').toString())
+        sqlConn.run(fs.readFileSync(path.join('test', 'destroy.sql')).toString())
             .done(function () {
                 expect(true).toBeTruthy();
                 done();
