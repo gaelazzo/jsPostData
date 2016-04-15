@@ -68,12 +68,10 @@ BEGIN
 set @i=1;
 while @i < 500 DO
     set @j=1;
-    while (@j<4) BEGIN
+    while (@j<4) DO
     insert into customerphone(idcustomer,idphone,phonekind,tel) values(
 			 @i,  @j,
 			 concat('phonename',convert(@j,CHAR(2)) ),
-			 10+@i,
-			'2010-09-24 12:27:38',
 			concat('tel_',convert(@i, CHAR(10)),'000',convert(@j, CHAR(10)))
 		);
 	set @j=@j+1;
@@ -140,10 +138,10 @@ while @i < 500 DO
             convert(RAND()*100000,CHAR(20))
 		);
     set @j=1;
-    while (@j<4) BEGIN
+    while (@j<4) DO
          insert into selleractivity (idseller,idactivity,description) values (
                     @i, @j,concat('activity',convert(@i,CHAR(10)),'-',convert(@j,char(10)))
-            )
+            );
     	set @j=@j+1;
 	END WHILE;
     set @i=@i+1;
@@ -213,7 +211,7 @@ CREATE PROCEDURE ctemp ()
 BEGIN
 set @i=0;
 while (@i<50) DO
-insert into customerkind (idcustomerkind,customerkindname,rnd) values(
+insert into customerkind (idcustomerkind,name,rnd) values(
 			 @i,
 			 concat('custom.kind-',convert(@i,char(10))),
 			RAND()*1000
@@ -290,11 +288,11 @@ CREATE TABLE sell(
     	idlist int  NOT NULL,
     	price decimal(19,2) NULL,
     	place varchar(100) NULL,
-    	date date  NULL
-     KEY PK_sell (idsell)
+    	date date  NULL,
+     PRIMARY KEY PK_sell (idsell)
 ) ;
 
-
+GO
 
 drop table IF EXISTS sellsupplement;
 
@@ -303,18 +301,18 @@ CREATE TABLE sellsupplement(
     	idsupplement int NOT NULL,
     	idselleraux int NOT NULL,
     	description varchar(100) NULL,
-     KEY PK_sell (idsell,idsupplement)
-) ;
+    PRIMARY KEY PK_sellsupplement (idsell,idsupplement)
+);
 
-
+GO
 
 CREATE PROCEDURE ctemp ()
 BEGIN
 set @i=1;
-while (@i<2000) BEGIN
+while (@i<2000) DO
 
     set @j=1;
-    while (@j<4) BEGIN
+    while (@j<4) DO
 
      insert into sell(	idsell,		idcustomer,		idseller,		idcoseller,		idcoseller2,
                 idlist,	price,		place) values(
@@ -322,7 +320,6 @@ while (@i<2000) BEGIN
                 @j,		@j*100, concat('place_',convert(@i,char(10)),'-',convert(@j,char(10)))  );
             insert into sellsupplement(idsell, idsupplement,idselleraux,description) values (
                             @i, (@i*10)+1, (@i%200)+40, concat('supplement ',convert(@i,char(10)))  );
-             )
             insert into sellsupplement(idsell, idsupplement,idselleraux,description) values (
                             @i, (@i*10)+2, (@i%200)+40, concat('supplement bis',convert(@i,char(10))) );
             set @j=@j+1;
@@ -338,7 +335,7 @@ call ctemp;
 
 
 DROP PROCEDURE IF EXISTS ctemp;
---select * from customerphone where idcustomer=23
+
 
 DROP VIEW  IF EXISTS customerview;
 

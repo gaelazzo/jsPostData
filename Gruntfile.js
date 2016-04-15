@@ -25,6 +25,7 @@ module.exports = function (grunt) {
 
         yuidoc: {
           compile: {
+            linkNatives: "true",
             name: '<%= pkg.name %>',
             description: '<%= pkg.description %>',
             version: '<%= pkg.version %>',
@@ -48,7 +49,7 @@ module.exports = function (grunt) {
           all: [],
           options: {
             coffee: false,
-            verbose: false,
+            verbose: true,
             match: '.',
             matchall: false,
             specFolders: ['./test/spec/'],
@@ -66,8 +67,7 @@ module.exports = function (grunt) {
           },
           single: {
             options: {
-              specFolders: ['./test/spec/'], //'./test/server/dataAccess'
-              //specFolders: ['./test/server/dataAccess/'], //'./test/server/dataAccess'
+              specFolders: ['./test/spec/'], 
               autotest: false
             }
           },
