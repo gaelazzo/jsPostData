@@ -282,41 +282,56 @@ GO
 drop table IF EXISTS sell;
 
 CREATE TABLE sell(
-	idsell int NOT NULL,
-	customerkindname varchar(100) NULL,
-	rnd int NULL,
-     KEY PK_customerkind (idcustomerkind)
+	 idsell int NOT NULL,
+    	idcustomer int NOT NULL,
+    	idseller int NOT NULL,
+    	idcoseller int NOT NULL,
+    	idcoseller2 int NOT NULL,
+    	idlist int  NOT NULL,
+    	price decimal(19,2) NULL,
+    	place varchar(100) NULL,
+    	date date  NULL
+     KEY PK_sell (idsell)
 ) ;
 
 
-CREATE TABLE [dbo].[sell](
-    [idsell] [int] NOT NULL,
-	[idcustomer] [int] NOT NULL,
-	[idseller] [int] NOT NULL,
-	[idcoseller] [int] NOT NULL,
-	[idcoseller2] [int] NOT NULL,
-	[idlist] [int]  NOT NULL,
-	price decimal(19,2) NULL,
-	place varchar(100) NULL,
-	date smalldatetime  NULL
- CONSTRAINT [PK_sell] PRIMARY KEY CLUSTERED ([idsell] ASC ) ON [PRIMARY]
-) ON [PRIMARY]
-GO
 
-IF EXISTS(select * from sysobjects where id = object_id(N'[dbo].[sellsupplement]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table IF EXISTS sellsupplement;
+
+CREATE TABLE sellsupplement(
+	 idsell int NOT NULL,
+    	idsupplement int NOT NULL,
+    	idselleraux int NOT NULL,
+    	description varchar(100) NULL,
+     KEY PK_sell (idsell,idsupplement)
+) ;
+
+
+
+CREATE PROCEDURE ctemp ()
 BEGIN
- drop table [dbo].sellsupplement
+set @i=1;
+while (@i<2000) BEGIN
+ insert into sell(	idsell,		idcustomer,		idseller,		idcoseller,		idcoseller2,
+            idlist,	price,		place) values(
+					@i,			(@i % 20)+1,	(@i % 200)+1,	(@i % 200)+5,	(@i % 200)+6,
+			@j,		@j*100,'place_'+convert(@i,char(10))+'-'+convert(@j,char(10))
+		)
+
+insert into customerkind (idcustomerkind,customerkindname,rnd) values(
+			 @i,
+			 concat('custom.kind-',convert(@i,char(10))),
+			RAND()*1000
+		);
+set @i=@i+1;
+end while;
+
+
 END
+
 GO
 
-CREATE TABLE [dbo].[sellsupplement](
-    [idsell] [int] NOT NULL,
-    [idsupplement] [int] NOT NULL,
-	[idselleraux] [int] NOT NULL,
-	description varchar(100) NULL
- CONSTRAINT [PK_sellsupplement] PRIMARY KEY CLUSTERED ([idsell] ASC, [idsupplement] ASC ) ON [PRIMARY]
-) ON [PRIMARY]
-GO
+call ctemp;
 
 
 
