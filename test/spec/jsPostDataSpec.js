@@ -1,5 +1,5 @@
 /*globals describe, beforeEach,it,expect,jasmine,spyOn */
-
+'use strict';
 /*jshint -W069 */
 
 var PostData = require('../../src/jsPostData').PostData,
@@ -38,6 +38,8 @@ var Environment       = require('../fakeEnvironment'),
 //PUT THE  FILENAME OF YOUR FILE HERE:
 
 var configName = path.join('test', 'db.json');
+var dbConfig;
+
 if (process.env.TRAVIS){
     dbConfig = { "server": "127.0.0.1",
         "dbName": "test",
