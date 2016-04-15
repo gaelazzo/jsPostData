@@ -312,20 +312,23 @@ CREATE PROCEDURE ctemp ()
 BEGIN
 set @i=1;
 while (@i<2000) BEGIN
- insert into sell(	idsell,		idcustomer,		idseller,		idcoseller,		idcoseller2,
-            idlist,	price,		place) values(
-					@i,			(@i % 20)+1,	(@i % 200)+1,	(@i % 200)+5,	(@i % 200)+6,
-			@j,		@j*100,'place_'+convert(@i,char(10))+'-'+convert(@j,char(10))
-		)
 
-insert into customerkind (idcustomerkind,customerkindname,rnd) values(
-			 @i,
-			 concat('custom.kind-',convert(@i,char(10))),
-			RAND()*1000
-		);
-set @i=@i+1;
+    set @j=1;
+    while (@j<4) BEGIN
+
+     insert into sell(	idsell,		idcustomer,		idseller,		idcoseller,		idcoseller2,
+                idlist,	price,		place) values(
+                        @i,			(@i % 20)+1,	(@i % 200)+1,	(@i % 200)+5,	(@i % 200)+6,
+                @j,		@j*100, concat('place_',convert(@i,char(10)),'-',convert(@j,char(10)))  );
+            insert into sellsupplement(idsell, idsupplement,idselleraux,description) values (
+                            @i, (@i*10)+1, (@i%200)+40, concat('supplement ',convert(@i,char(10)))  );
+             )
+            insert into sellsupplement(idsell, idsupplement,idselleraux,description) values (
+                            @i, (@i*10)+2, (@i%200)+40, concat('supplement bis',convert(@i,char(10))) );
+            set @j=@j+1;
+            set @i=@i+1;
+     end while;
 end while;
-
 
 END
 
@@ -334,42 +337,12 @@ GO
 call ctemp;
 
 
-
-declare @i int
-declare @j int
-set @i=1
-select RAND(100)
-while (@i<2000) BEGIN
-
-set @j=1
-while (@j<4) BEGIN
- insert into sell(	idsell,		idcustomer,		idseller,		idcoseller,		idcoseller2,	idlist,	price,		place) values(
-					@i,			(@i % 20)+1,	(@i % 200)+1,	(@i % 200)+5,	(@i % 200)+6,	@j,		@j*100,'place_'+convert(varchar(10),@i)+'-'+convert(varchar(10),@j)
-		)
- insert into sellsupplement(idsell, idsupplement,idselleraux,description) values (
-                @i, (@i*10)+1, (@i%200)+40, 'supplement '+convert(varchar(10),@i)
- )
-insert into sellsupplement(idsell, idsupplement,idselleraux,description) values (
-                @i, (@i*10)+2, (@i%200)+40, 'supplement bis'+convert(varchar(10),@i)
- )
-
-	set @j=@j+1
-	set @i=@i+1
-END
-
-end
-GO
+DROP PROCEDURE IF EXISTS ctemp;
 --select * from customerphone where idcustomer=23
 
-IF EXISTS(select * from sysobjects where id = object_id(N'[dbo].[customerview]') and OBJECTPROPERTY(id, N'IsView') = 1)
-DROP VIEW [dbo].customerview
-GO
-IF EXISTS(select * from sysobjects where id = object_id(N'[dbo].[sellerview]') and OBJECTPROPERTY(id, N'IsView') = 1)
-DROP VIEW [dbo].sellerview
-GO
+DROP VIEW  IF EXISTS customerview;
 
-
-CREATE   VIEW [dbo].[customerview]
+CREATE   VIEW customerview
 (
 	idcustomer,
 	idcustomerkind,
@@ -385,7 +358,9 @@ as select
 		left outer join customerkind CK on C.idcustomerkind= CK.idcustomerkind
 GO
 
-CREATE   VIEW [dbo].[sellerview]
+DROP VIEW  IF EXISTS sellerview;
+
+CREATE   VIEW sellerview
 (
 	idseller,
 	idsellerkind,
@@ -401,12 +376,11 @@ as select
 		left outer join sellerkind CK on C.idsellerkind= CK.idsellerkind
 GO
 
-IF EXISTS(select * from sysobjects where id = object_id(N'[dbo].[sellview]') and OBJECTPROPERTY(id, N'IsView') = 1)
-DROP VIEW [dbo].sellview
-GO
 
 
-CREATE   VIEW [dbo].[sellview]
+DROP VIEW  IF EXISTS sellview;
+
+CREATE   VIEW sellview
 (
 	idsell,
 	place,
