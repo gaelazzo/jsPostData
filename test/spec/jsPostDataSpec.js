@@ -338,7 +338,7 @@ describe('PostData', function () {
             // tab8 because at that point, tab7 is an allowed parent. Also comes tab2, because tab1 is allowed as
             // parent at that point. Then come tab9 and tab3 because tab2 and tab8 are then allowed parents.
             // Then come tab10 and tab4, then tab5 and finally tab6.
-            expect(_.pluck(res, 'name')).toEqual(['tab7', 'tab1', 'tab8', 'tab2', 'tab9', 'tab3', 'tab10', 'tab4', 'tab5', 'tab6']);
+            expect(_.map(res, 'name')).toEqual(['tab7', 'tab1', 'tab8', 'tab2', 'tab9', 'tab3', 'tab10', 'tab4', 'tab5', 'tab6']);
 
         });
 
@@ -364,7 +364,7 @@ describe('PostData', function () {
             var p = new PostData(),
                 res = p.sortTables(d, p.checkIsNotParent);
             // tab 10 is not parent, then comes tab 9 cause tab10 now is an allowed parent then tab8 and so on
-            expect(_.pluck(res, 'name')).toEqual(['tab10', 'tab9', 'tab8', 'tab7', 'tab6', 'tab5', 'tab4', 'tab3', 'tab2', 'tab1']);
+            expect(_.map(res, 'name')).toEqual(['tab10', 'tab9', 'tab8', 'tab7', 'tab6', 'tab5', 'tab4', 'tab3', 'tab2', 'tab1']);
 
         });
 
@@ -393,7 +393,7 @@ describe('PostData', function () {
                 res = p.sortTables(d, p.checkIsNotParent);
             //they are all parents but tab4 because tab5 is empty. So then tab4 becomes an allowed parent and tab3 can follow
             // then tab2 and tab1. At this point, tab1 is an allowed parent for tab10 so comes tab10, then tab8,tab7,6,5
-            expect(_.pluck(res, 'name')).toEqual(['tab4', 'tab3', 'tab2', 'tab1', 'tab10', 'tab9', 'tab8', 'tab7', 'tab6', 'tab5']);
+            expect(_.map(res, 'name')).toEqual(['tab4', 'tab3', 'tab2', 'tab1', 'tab10', 'tab9', 'tab8', 'tab7', 'tab6', 'tab5']);
 
         });
 
@@ -419,8 +419,8 @@ describe('PostData', function () {
                 j,
                 p = new PostData(),
                 res = p.changeList(d),
-                childFirst = _.pluck(p.sortTables(d, p.checkIsNotParent), 'name'),
-                parentFirst = _.pluck(p.sortTables(d, p.checkIsNotChild), 'name');
+                childFirst = _.map(p.sortTables(d, p.checkIsNotParent), 'name'),
+                parentFirst = _.map(p.sortTables(d, p.checkIsNotChild), 'name');
 
 
             for (i = 0; i < res.length; i++) {
@@ -479,8 +479,8 @@ describe('PostData', function () {
             var j,
                 p = new PostData(),
                 res = p.changeList(d),
-                childFirst = _.pluck(p.sortTables(d, p.checkIsNotParent), 'name'),
-                parentFirst = _.pluck(p.sortTables(d, p.checkIsNotChild), 'name');
+                childFirst = _.map(p.sortTables(d, p.checkIsNotParent), 'name'),
+                parentFirst = _.map(p.sortTables(d, p.checkIsNotChild), 'name');
 
             for (i = 0; i < res.length; i++) {
                 if (res[i].getRow().state !== dataRowState.deleted) {
@@ -524,8 +524,8 @@ describe('PostData', function () {
                     j,
                     p = new PostData(),
                     res = p.changeList(d),
-                    childFirst = _.pluck(p.sortTables(d, p.checkIsNotParent), 'name'),
-                    parentFirst = _.pluck(p.sortTables(d, p.checkIsNotChild), 'name');
+                    childFirst = _.map(p.sortTables(d, p.checkIsNotParent), 'name'),
+                    parentFirst = _.map(p.sortTables(d, p.checkIsNotChild), 'name');
 
 
                 for (i = 0; i < res.length; i++) {
