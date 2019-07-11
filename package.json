@@ -7,7 +7,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "lodash": "4.6.1",
+    "lodash": "4.7.13",
     "async": "~1.4.0",
     "jsEncryptedFile": "https://github.com/gaelazzo/jsEncryptedFile",
     "jsDataAccess": "https://github.com/gaelazzo/jsDataAccess",
@@ -16,7 +16,7 @@
     "jsMultiSelect": "git://github.com/gaelazzo/jsMultiSelect",
     "jsDbList": "https://github.com/gaelazzo/jsDbList",
     "jsDataQuery": "https://github.com/gaelazzo/jsDataQuery",
-    "jsSqlServerDriver":"https://github.com/gaelazzo/jsSqlServerDriver"
+    "jsSqlServerDriver": "https://github.com/gaelazzo/jsSqlServerDriver"
   },
   "devDependencies": {
     "edge": "~5.0.0",
