@@ -16,6 +16,7 @@ var Environment       = require('../fakeEnvironment'),
     dbList            = require('jsDbList'),
     dataRowState      = dsNameSpace.dataRowState,
     DataSet           = dsNameSpace.DataSet,
+    DataColumn        = dsNameSpace.DataColumn,
     Select            = require('jsMultiSelect').Select,
     OptimisticLocking = dsNameSpace.OptimisticLocking,
     fs                = require('fs'),
@@ -116,17 +117,17 @@ describe('PostData', function () {
             i = 11;
             while (--i > 0) {
                 t = d.newTable('tab' + i);
-                t.columns.push('id' + i);
-                t.columns.push('data' + i);
+                t.setDataColumn('id' + i,'int32');
+                t.setDataColumn('data' + i,'int32');
                 if (i < 10) {
-                    t.columns.push('idExt' + (i + 1));
+                    t.setDataColumn('idExt' + (i + 1),'int32');
                     d.newRelation('r' + i + 'a', 'tab' + i, ['idExt' + (i + 1)], 'tab' + (i + 1), ['id' + (i + 1)]);
                 }
                 if (i < 9) {
-                    t.columns.push('idExt' + (i + 2));
+                    t.setDataColumn('idExt' + (i + 2),'int32');
                 }
                 if (i < 8) {
-                    t.columns.push('idExt' + (i + 3));
+                    t.setDataColumn('idExt' + (i + 3),'int32');
                 }
                 rowCount = 0;
                 while (++rowCount < 6) {
@@ -883,17 +884,17 @@ describe('PostData', function () {
             i = 11;
             while (--i > 0) {
                 t = d.newTable('tab' + i);
-                t.columns.push('id' + i);
-                t.columns.push('data' + i);
+                t.setDataColumn('id' + i,'int32');
+                t.setDataColumn('data' + i,'int32');
                 if (i < 10) {
-                    t.columns.push('idExt' + (i + 1));
+                    t.setDataColumn('idExt' + (i + 1),'int32');
                     d.newRelation('r' + i + 'a', 'tab' + i, ['idExt' + (i + 1)], 'tab' + (i + 1), ['id' + (i + 1)]);
                 }
                 if (i < 9) {
-                    t.columns.push('idExt' + (i + 2));
+                    t.setDataColumn('idExt' + (i + 2),'int32');
                 }
                 if (i < 8) {
-                    t.columns.push('idExt' + (i + 3));
+                    t.setDataColumn('idExt' + (i + 3),'int32');
                 }
                 rowCount = 0;
                 while (++rowCount < 6) {
@@ -1498,17 +1499,17 @@ describe('PostData', function () {
             i = 11;
             while (--i > 0) {
                 t = d.newTable('tab' + i);
-                t.columns.push('id' + i);
-                t.columns.push('data' + i);
+                t.setDataColumn('id' + i,'int32');
+                t.setDataColumn('data' + i,'int32');
                 if (i < 10) {
-                    t.columns.push('idExt' + (i + 1));
+                    t.setDataColumn('idExt' + (i + 1),'int32');
                     d.newRelation('r' + i + 'a', 'tab' + i, ['idExt' + (i + 1)], 'tab' + (i + 1), ['id' + (i + 1)]);
                 }
                 if (i < 9) {
-                    t.columns.push('idExt' + (i + 2));
+                    t.setDataColumn('idExt' + (i + 2),'int32');
                 }
                 if (i < 8) {
-                    t.columns.push('idExt' + (i + 3));
+                    t.setDataColumn('idExt' + (i + 3),'int32');
                 }
                 rowCount = 0;
                 while (++rowCount < 6) {
@@ -1810,17 +1811,17 @@ describe('PostData', function () {
             i = 11;
             while (--i > 0) {
                 t = d.newTable('tab' + i);
-                t.columns.push('id' + i);
-                t.columns.push('data' + i);
+                t.setDataColumn('id' + i,'int32');
+                t.setDataColumn('data' + i,'int32');
                 if (i < 10) {
-                    t.columns.push('idExt' + (i + 1));
+                    t.setDataColumn('idExt' + (i + 1),'int32');
                     d.newRelation('r' + i + 'a', 'tab' + i, ['idExt' + (i + 1)], 'tab' + (i + 1), ['id' + (i + 1)]);
                 }
                 if (i < 9) {
-                    t.columns.push('idExt' + (i + 2));
+                    t.setDataColumn('idExt' + (i + 2),'int32');
                 }
                 if (i < 8) {
-                    t.columns.push('idExt' + (i + 3));
+                    t.setDataColumn('idExt' + (i + 3),'int32');
                 }
                 rowCount = 0;
                 while (++rowCount < 6) {
@@ -2084,17 +2085,17 @@ describe('PostData', function () {
             i = 11;
             while (--i > 0) {
                 t = d.newTable('tab' + i);
-                t.columns.push('id' + i);
-                t.columns.push('data' + i);
+                t.setDataColumn('id' + i,'int32');
+                t.setDataColumn('data' + i,'int32');
                 if (i < 10) {
-                    t.columns.push('idExt' + (i + 1));
+                    t.setDataColumn('idExt' + (i + 1),'int32');
                     d.newRelation('r' + i + 'a', 'tab' + i, ['idExt' + (i + 1)], 'tab' + (i + 1), ['id' + (i + 1)]);
                 }
                 if (i < 9) {
-                    t.columns.push('idExt' + (i + 2));
+                    t.setDataColumn('idExt' + (i + 2),'int32');
                 }
                 if (i < 8) {
-                    t.columns.push('idExt' + (i + 3));
+                    t.setDataColumn('idExt' + (i + 3),'int32');
                 }
                 t.key(['id' + i]);
                 rowCount = 0;
