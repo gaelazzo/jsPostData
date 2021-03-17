@@ -1,35 +1,35 @@
-
+/*globals ObjectRow,Environment,sqlFun */
 /**
  * Manages data storing
  * @module PostData
  */
 'use strict';
 
-var dsSpace = require('jsDataSet');
-var DataSet = dsSpace.DataSet;
+const dsSpace = require('jsDataSet');
+const DataSet = dsSpace.DataSet;
 
 /**
  * @type {DataRow}
  */
-var  DataRow = dsSpace.DataRow;
+const DataRow = dsSpace.DataRow;
 
-var DataTable = dsSpace.DataTable;
+const DataTable = dsSpace.DataTable;
 
-var  jsMultiSelect = require('jsMultiSelect');
-var   DataAccess = require('jsDataAccess').DataAccess;
-var   Select = jsMultiSelect.Select;
-var  isolationLevels= require('jsDataAccess').isolationLevels;
-var  dataRowState = dsSpace.dataRowState;
+const jsMultiSelect = require('jsMultiSelect');
+const DataAccess = require('jsDataAccess').DataAccess;
+const Select = jsMultiSelect.Select;
+const isolationLevels = require('jsDataAccess').isolationLevels;
+const dataRowState = dsSpace.dataRowState;
 
-var  _ = require('lodash');
+const _ = require('lodash');
 
 /**
  *
  * @type Deferred
  */
-  var Deferred = require("jsDeferred");
+const Deferred = require("jsDeferred");
 
-  var async = require('async');
+const async = require('async');
 
 /**
  * Manages a cache of select max done in a transaction
@@ -84,22 +84,22 @@ MaxCacher.prototype.getHash = function(table, column,filter,expr){
  * @return {number}
  */
 MaxCacher.prototype.getMax = function (r, column, selectors, filter, expr) {
-  var def =  Deferred(),
-    that = this,
-    table = r.getRow().table,
-    k = this.getHash(table.name, column, filter, expr);
+  const def = Deferred(),
+      that = this,
+      table = r.getRow().table,
+      k = this.getHash(table.name, column, filter, expr);
   if (this.allMax[k]){
     def.resolve(this.allMax[k]);
     return def.promise();
   }
-  var keySelectors = _.intersection(selectors, table.key()); //fields both key and selector
+  const keySelectors = _.intersection(selectors, table.key()); //fields both key and selector
   if (keySelectors.length > 0) {
     if (_.find(table.dataset.relationsByChild[table.name], function (parentRel) {
-      var parentRows = parentRel.getParents(r);
+      const parentRows = parentRel.getParents(r);
       if (parentRows.length !== 1) {
         return false;
       }
-      var parentRow = parentRows[0];
+      const parentRow = parentRows[0];
       if (parentRow.getRow().state !== dataRowState.added) {
         return false;
       }
@@ -176,9 +176,9 @@ PostData.prototype = {
  * @return {DataTable[]}
  */
 PostData.prototype.sortTables = function(d, checkFunction){
-  var result = [],
-    hash = {},
-    added = true;
+  const result = [],
+      hash = {};
+  let added = true;
 
   function check(t){
     if (hash[t.name]) {
@@ -208,11 +208,11 @@ PostData.prototype.sortTables = function(d, checkFunction){
  * @return boolean
  */
 PostData.prototype.checkIsNotChild = function (ds, tableName, allowedParents){
-  var foundRel = _.find(ds.relationsByChild[tableName], function(rel){
-    if (allowedParents[rel.parentTable]){
+  const foundRel = _.find(ds.relationsByChild[tableName], function (rel) {
+    if (allowedParents[rel.parentTable]) {
       return false; //child relation has NOT been found
     }
-    if (!ds.tables[rel.parentTable].hasChanges()){
+    if (!ds.tables[rel.parentTable].hasChanges()) {
       return false; //parentTable has  no change, relation is allowed
     }
     return true;
@@ -228,11 +228,11 @@ PostData.prototype.checkIsNotChild = function (ds, tableName, allowedParents){
  * @return boolean
  */
 PostData.prototype.checkIsNotParent = function(ds, tableName, allowedChilds) {
-  var foundRel = _.find(ds.relationsByParent[tableName], function (rel) {
+  const foundRel = _.find(ds.relationsByParent[tableName], function (rel) {
     if (allowedChilds[rel.childTable]) {
       return false; //parent relation has NOT been found
     }
-    if (ds.tables[rel.childTable].rows.length===0) {
+    if (ds.tables[rel.childTable].rows.length === 0) {
       return false; //childTable is empty so  relation is allowed
     }
     return true;
@@ -249,10 +249,10 @@ PostData.prototype.checkIsNotParent = function(ds, tableName, allowedChilds) {
  */
 function getTableOps(tables, rowState) {
   return _.reduce(tables, function (list, t) {
-    var res = _.filter(t.rows,
-      function (r) {
-        return (r.getRow().state === rowState);
-      }
+    let res = _.filter(t.rows,
+        function (r) {
+          return (r.getRow().state === rowState);
+        }
     );
     if (t.postingOrder) {
       res = _.sortBy(res, t.postingOrder);
@@ -274,8 +274,8 @@ function getTableOps(tables, rowState) {
  * @param {DataSet} original
  */
 PostData.prototype.changeList = function(original) {
-  var parentFirst = this.sortTables(original, this.checkIsNotChild),
-    childFirst = this.sortTables(original, this.checkIsNotParent);
+  const parentFirst = this.sortTables(original, this.checkIsNotChild),
+      childFirst = this.sortTables(original, this.checkIsNotParent);
   return _.map(getTableOps(childFirst, dataRowState.deleted).concat(
     getTableOps(parentFirst, dataRowState.added),
     getTableOps(parentFirst, dataRowState.modified)
@@ -284,9 +284,9 @@ PostData.prototype.changeList = function(original) {
 
 
 function defaultCallChecks(post){
-  var def =  Deferred();
+  const def = Deferred();
 
-  var res = {checks:[], shouldContinue:true};
+  const res = {checks: [], shouldContinue: true};
   def.resolve(res);
   return def.promise();
 }
@@ -320,18 +320,18 @@ function defaultAddError(msg) {
  * @return {object}   {checks:ProcedureMessage[], data:DataSet}
  */
 PostData.prototype.doPost = function(changedRows, options) {
-  var opt = options || {},
+  const opt = options || {},
       checks = [],
-      that = this,
-      opened = false,
+      that = this;
+  let opened = false,
       tranOpen = false,
-      terminated = false,
-      result = {checks: checks};
+      terminated = false;
+  const result = {checks: checks};
   /**
    * @var def
    * @type Deferred
    */
-  var def = Deferred();
+  const def = Deferred();
   _.defaults(opt, {
     getChecks: defaultCallChecks,
     getError: defaultAddError,
@@ -379,7 +379,7 @@ PostData.prototype.doPost = function(changedRows, options) {
                 .done(function () {
                   dbError(err);
                   def.resolve(result);
-                })
+                });
           });
       return def.promise();
     }
@@ -470,8 +470,8 @@ PostData.prototype.doPost = function(changedRows, options) {
              * @param {ObjectRow} r
              */
             function (r) {
-          r.getRow().acceptChanges();
-        });
+              r.getRow().acceptChanges();
+            });
         return that.reselectAllViews(_.filter(changedRows, function (r) {
           return r.getRow !== undefined;
         }));
@@ -503,7 +503,7 @@ PostData.prototype.doPost = function(changedRows, options) {
  */
 PostData.prototype.getSelectAllViews = function (changedRows) {
   return _.reduce(changedRows, function (list, r) {
-    var table = r.getRow().table;
+    const table = r.getRow().table;
     if (table.name === table.tableForWriting()) {
       return list;
     }
@@ -527,12 +527,13 @@ PostData.prototype.getSelectAllViews = function (changedRows) {
  * @returns {*}
  */
 PostData.prototype.reselectAllViews = function(changedRows){
-  var def=  Deferred(), selectList;
+  const def = Deferred();
+  let selectList;
   if (changedRows.length === 0){
     def.resolve();
     return def.promise();
   }
-  var ds = changedRows[0].getRow().table.dataset;
+  const ds = changedRows[0].getRow().table.dataset;
 
   selectList = this.getSelectAllViews(changedRows);
 
@@ -568,10 +569,10 @@ function promiseParallel(tasks) {
  * @return {promise} //resolves false if customFunction was found, true otherwise
  */
 PostData.prototype.calcAutoId = function(r, autoIncrementProperty) {
- var that=this,
-   def =  Deferred(),
-   table = r.getRow().table,
-   field = autoIncrementProperty.columnName;
+  const that = this,
+      def = Deferred(),
+      table = r.getRow().table,
+      field = autoIncrementProperty.columnName;
 
   if (autoIncrementProperty.customFunction){
     autoIncrementProperty.customFunction(r, field, this.conn)
@@ -582,14 +583,14 @@ PostData.prototype.calcAutoId = function(r, autoIncrementProperty) {
     return def.promise();
   }
 
- var selector = autoIncrementProperty.getSelector(r),
-   fieldExpr = autoIncrementProperty.getExpression(r),
-   prefix = autoIncrementProperty.getPrefix(r);
+  const selector = autoIncrementProperty.getSelector(r),
+      fieldExpr = autoIncrementProperty.getExpression(r),
+      prefix = autoIncrementProperty.getPrefix(r);
 
 
   this.maxCacher.getMax(r, field, autoIncrementProperty.selector, selector, fieldExpr)
     .then(function (res) {
-      var foundID, newID;
+      let foundID, newID;
       if (res === null || res === undefined) {
         newID = 1;
       } else {
@@ -615,9 +616,9 @@ PostData.prototype.calcAutoId = function(r, autoIncrementProperty) {
  * @returns {promise} return true if NO custom autoincrement was found
  */
 PostData.prototype.calcAllAutoId = function(r) {
-  var that= this,
-    def  =  Deferred(),
-    table = r.getRow().table;
+  const that = this,
+      def = Deferred(),
+      table = r.getRow().table;
   if (r.getRow().state !== dataRowState.added){
     def.resolve(true);
     return def.promise();
@@ -627,7 +628,7 @@ PostData.prototype.calcAllAutoId = function(r) {
     return that.calcAutoId(r, table.autoIncrement(col));
   }))
     .done(function(){
-      var arr = Array.prototype.slice.call(arguments);
+      const arr = Array.prototype.slice.call(arguments);
       def.resolve(_.every(arr,function(el){return el}));
     });
   return def.promise();
@@ -641,12 +642,12 @@ PostData.prototype.calcAllAutoId = function(r) {
   * @returns {string}
   */
  PostData.prototype.getSqlStatements = function (changedRows, optimisticLocking){
-  var def =  Deferred(),
-    that=this,
-    internalIndex = 0,
-    rows = [],
-    sql,
-    failed= false;
+   const def = Deferred(),
+       that = this;
+   let internalIndex = 0,
+       rows = [],
+       sql,
+       failed = false;
 
    /**
     *
@@ -658,8 +659,8 @@ PostData.prototype.calcAllAutoId = function(r) {
        return;
      }
      rows.push(preparedRow);
-     var cmd = that.conn.getPostCommand(preparedRow, optimisticLocking, that.environment),
-       errCmd = that.sqlConn.giveErrorNumberDataWasNotWritten(internalIndex);
+     const cmd = that.conn.getPostCommand(preparedRow, optimisticLocking, that.environment),
+         errCmd = that.sqlConn.giveErrorNumberDataWasNotWritten(internalIndex);
      if (sql) {
        sql = that.sqlConn.appendCommands([sql, cmd, errCmd]);
      } else {
@@ -712,7 +713,7 @@ PostData.prototype.sqlSizeLimit = 4000;
   * @returns {*}
   */
  PostData.prototype.reselect = function(row) {
-   var table = row.getRow().table;
+   const table = row.getRow().table;
    row.getRow().rejectChanges();
    return this.conn.selectIntoTable({
      table: table,
@@ -730,15 +731,15 @@ PostData.prototype.sqlSizeLimit = 4000;
   * @returns {*} Resolved promise if all ok, rejected promise if errors
   */
 PostData.prototype.physicalPostBatch = function(changedRows, optimisticLocking){
-  var def =  Deferred(),
-    that= this,
-    sqlCmdLaunched= 0,
-    sqlCmdRun= 0,
-    endOfCmdReached=false,
-    failed = false;
+  const def = Deferred(),
+      that = this;
+  let sqlCmdLaunched = 0,
+      sqlCmdRun = 0,
+      endOfCmdReached = false,
+      failed = false;
 
   function sqlCmdRunner(rows,sql){
-    var sqlComplete = that.sqlConn.appendCommands([sql, that.sqlConn.giveConstant(-1)]);
+    const sqlComplete = that.sqlConn.appendCommands([sql, that.sqlConn.giveConstant(-1)]);
     sqlCmdLaunched += 1;
     that.conn.runCmd(sqlComplete)
       .done(function(res){
@@ -755,8 +756,8 @@ PostData.prototype.physicalPostBatch = function(changedRows, optimisticLocking){
           return;
         }
 
-        var row = rows[res],
-          sqlErrorCmd = that.conn.getPostCommand(row, optimisticLocking, that.environment);
+        const row = rows[res],
+            sqlErrorCmd = that.conn.getPostCommand(row, optimisticLocking, that.environment);
         if (row.getRow().state === dataRowState.modified){
           that.reselect(row)
             .done(function(){

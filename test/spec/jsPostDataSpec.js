@@ -2,7 +2,7 @@
 'use strict';
 /*jshint -W069 */
 
-var PostData = require('../../src/jsPostData').PostData,
+const PostData = require('../../src/jsPostData').PostData,
     MaxCacher = require('../../src/jsPostData').MaxCacher,
     dsNameSpace = require('jsDataSet'),
     dq = require('jsDataQuery'),
@@ -11,18 +11,17 @@ var PostData = require('../../src/jsPostData').PostData,
  *
  * @type {Deferred}
  */
-var    Deferred = require("jsDeferred");
-var Environment       = require('../fakeEnvironment'),
-    dbList            = require('jsDbList'),
-    dataRowState      = dsNameSpace.dataRowState,
-    DataSet           = dsNameSpace.DataSet,
-    DataColumn        = dsNameSpace.DataColumn,
-    Select            = require('jsMultiSelect').Select,
+const Deferred = require("jsDeferred");
+const Environment = require('../fakeEnvironment'),
+    dbList = require('jsDbList'),
+    dataRowState = dsNameSpace.dataRowState,
+    DataSet = dsNameSpace.DataSet,
+    DataColumn = dsNameSpace.DataColumn,
+    Select = require('jsMultiSelect').Select,
     OptimisticLocking = dsNameSpace.OptimisticLocking,
-    fs                = require('fs'),
-    path              = require('path'),
-    _                 = require('lodash');
-
+    fs = require('fs'),
+    path = require('path'),
+    _ = require('lodash');
 
 
 /**
@@ -36,10 +35,8 @@ var Environment       = require('../fakeEnvironment'),
  *    "pwd": "db password"
  *  }
  */
-//PUT THE  FILENAME OF YOUR FILE HERE:
-
-var configName = path.join('test', 'db.json');
-var dbConfig;
+const configName = path.join('test', 'db.json');
+let dbConfig;
 
 if (process.env.TRAVIS){
     dbConfig = { "server": "127.0.0.1",
@@ -61,7 +58,7 @@ dbList.init({
     encryptedFileName: 'test/dbList.bin'
 });
 
-var good = {
+const good = {
     server: dbConfig.server,
     useTrustedConnection: false,
     user: dbConfig.user,
@@ -72,7 +69,7 @@ var good = {
 
 
 describe('setup dataBase', function () {
-    var sqlConn;
+    let sqlConn;
     beforeEach(function (done) {
         dbList.setDbInfo('test', good);
         sqlConn = dbList.getConnection('test');
@@ -105,14 +102,13 @@ describe('setup dataBase', function () {
 });
 
 describe('PostData', function () {
-'use strict';
-    var DAC, env;
+    let DAC, env;
 
 
     describe('changeList', function () {
-        var d;
+        let d;
         beforeEach(function (done) {
-            var i, t, rowCount, row;
+            let i, t, rowCount, row;
             d = new DataSet('D');
             i = 11;
             while (--i > 0) {
@@ -164,7 +160,7 @@ describe('PostData', function () {
 
 
         it('should return as many rows as there were modified in d', function () {
-            var p = new PostData(DAC),
+            const p = new PostData(DAC),
                 res = p.changeList(d);
             expect(res.length).toBe(50);
         });
@@ -173,21 +169,21 @@ describe('PostData', function () {
         it('should return as many rows as there were modified in d (2th set)', function () {
             d.tables.tab1.acceptChanges();
             d.tables.tab3.clear();
-            var p = new PostData(),
+            const p = new PostData(),
                 res = p.changeList(d);
             expect(res.length).toBe(40);
         });
 
         it('should return as many rows as there were modified in d (3th set)', function () {
             d.tables.tab4.rejectChanges();
-            var p = new PostData(),
+            const p = new PostData(),
                 res = p.changeList(d);
             expect(res.length).toBe(45);
         });
 
         it('should return as many rows as there were modified in d (4th set)', function () {
             d.acceptChanges();
-            var p = new PostData(),
+            const p = new PostData(),
                 res = p.changeList(d);
             expect(res.length).toBe(0);
         });
@@ -197,7 +193,7 @@ describe('PostData', function () {
             d.tables.tab6.acceptChanges();
             d.tables.tab8.acceptChanges();
             d.tables.tab9.acceptChanges();
-            var i = 0;
+            const i = 0;
             d.tables.tab4.rows[0].getRow().del();
             d.tables.tab4.rows[3].getRow().del();
             d.tables.tab4.rows[2].data4 = 'ciao';
@@ -211,7 +207,7 @@ describe('PostData', function () {
             d.tables.tab9.rows[1].data9 = 'sayonara';
             d.tables.tab9.rows[2].data9 = 'sayonara';
 
-            var p = new PostData(),
+            const p = new PostData(),
                 res = p.changeList(d);
             expect(res.length).toBe(40);
         });
@@ -221,7 +217,7 @@ describe('PostData', function () {
             d.tables.tab6.acceptChanges();
             d.tables.tab8.acceptChanges();
             d.tables.tab9.acceptChanges();
-            var i = 0;
+            const i = 0;
             d.tables.tab4.rows[0].getRow().del();
             d.tables.tab4.rows[1].getRow().del();
             d.tables.tab4.rows[2].getRow().del();
@@ -236,7 +232,7 @@ describe('PostData', function () {
             d.tables.tab9.rows[1].data9 = 'sayonara';
             d.tables.tab9.rows[2].data9 = 'sayonara';
 
-            var p = new PostData(),
+            const p = new PostData(),
                 res = p.changeList(d);
             expect(res.length).toBe(41);
         });
@@ -246,7 +242,7 @@ describe('PostData', function () {
             d.tables.tab6.acceptChanges();
             d.tables.tab8.acceptChanges();
             d.tables.tab9.acceptChanges();
-            var i = 0;
+            const i = 0;
             d.tables.tab4.rows[0].getRow().del();
             d.tables.tab4.rows[1].getRow().del();
             d.tables.tab4.rows[2].getRow().del();
@@ -261,7 +257,7 @@ describe('PostData', function () {
             d.tables.tab9.rows[1].data9 = 'sayonara';
             d.tables.tab9.rows[2].data9 = 'sayonara';
 
-            var p = new PostData();
+            const p = new PostData();
             expect(p.checkIsNotParent(d, 'tab4', {})).toBeFalsy();
             expect(p.checkIsNotParent(d, 'tab4', {tab5: true})).toBeTruthy();
             expect(p.checkIsNotParent(d, 'tab5', {})).toBeFalsy();
@@ -283,7 +279,7 @@ describe('PostData', function () {
             d.tables['tab6'].acceptChanges();
             d.tables['tab8'].acceptChanges();
             d.tables['tab9'].acceptChanges();
-            var i = 0;
+            const i = 0;
             d.tables['tab4'].rows[0].getRow().del();
             d.tables['tab4'].rows[1].getRow().del();
             d.tables['tab4'].rows[2].getRow().del();
@@ -298,7 +294,7 @@ describe('PostData', function () {
             d.tables['tab9'].rows[1].data9 = 'sayonara';
             d.tables['tab9'].rows[2].data9 = 'sayonara';
 
-            var p = new PostData();
+            const p = new PostData();
             expect(p.checkIsNotChild(d, 'tab4', {})).toBeFalsy();
             expect(p.checkIsNotChild(d, 'tab4', {tab3: true})).toBeTruthy();
             expect(p.checkIsNotChild(d, 'tab5', {})).toBeFalsy();
@@ -320,7 +316,7 @@ describe('PostData', function () {
             d.tables.tab6.acceptChanges();
             d.tables.tab8.acceptChanges();
             d.tables.tab9.acceptChanges();
-            var i = 0;
+            const i = 0;
             d.tables.tab4.rows[0].getRow().del();
             d.tables.tab4.rows[1].getRow().del();
             d.tables.tab4.rows[2].getRow().del();
@@ -334,7 +330,7 @@ describe('PostData', function () {
 
             d.tables.tab9.rows[1].data9 = 'sayonara';
             d.tables.tab9.rows[2].data9 = 'sayonara';
-            var p = new PostData(),
+            const p = new PostData(),
                 res = p.sortTables(d, p.checkIsNotChild);
             // tab 10, 9, 8 are children. Tab7 is not because tab6 is unchanged
             //we have inserted tables in reverse order so tab7 comes before than tab1. After putting tab7, comes
@@ -350,7 +346,7 @@ describe('PostData', function () {
             d.tables.tab6.acceptChanges();
             d.tables.tab8.acceptChanges();
             d.tables.tab9.acceptChanges();
-            var i = 0;
+            const i = 0;
             d.tables.tab4.rows[0].getRow().del();
             d.tables.tab4.rows[1].getRow().del();
             d.tables.tab4.rows[2].getRow().del();
@@ -364,7 +360,7 @@ describe('PostData', function () {
 
             d.tables.tab9.rows[1].data9 = 'sayonara';
             d.tables.tab9.rows[2].data9 = 'sayonara';
-            var p = new PostData(),
+            const p = new PostData(),
                 res = p.sortTables(d, p.checkIsNotParent);
             // tab 10 is not parent, then comes tab 9 cause tab10 now is an allowed parent then tab8 and so on
             expect(_.map(res, 'name')).toEqual(['tab10', 'tab9', 'tab8', 'tab7', 'tab6', 'tab5', 'tab4', 'tab3', 'tab2', 'tab1']);
@@ -378,7 +374,7 @@ describe('PostData', function () {
             d.tables.tab6.acceptChanges();
             d.tables.tab8.acceptChanges();
             d.tables.tab9.acceptChanges();
-            var i = 0;
+            const i = 0;
             d.tables.tab4.rows[0].getRow().del();
             d.tables.tab4.rows[1].getRow().del();
             d.tables.tab4.rows[2].getRow().del();
@@ -392,7 +388,7 @@ describe('PostData', function () {
 
             d.tables.tab9.rows[1].data9 = 'sayonara';
             d.tables.tab9.rows[2].data9 = 'sayonara';
-            var p = new PostData(),
+            const p = new PostData(),
                 res = p.sortTables(d, p.checkIsNotParent);
             //they are all parents but tab4 because tab5 is empty. So then tab4 becomes an allowed parent and tab3 can follow
             // then tab2 and tab1. At this point, tab1 is an allowed parent for tab10 so comes tab10, then tab8,tab7,6,5
@@ -418,9 +414,9 @@ describe('PostData', function () {
 
             d.tables.tab9.rows[1].data9 = 'sayonara';
             d.tables.tab9.rows[2].data9 = 'sayonara';
-            var i = 0,
-                j,
-                p = new PostData(),
+            let i = 0,
+                j;
+            const p = new PostData(),
                 res = p.changeList(d),
                 childFirst = _.map(p.sortTables(d, p.checkIsNotParent), 'name'),
                 parentFirst = _.map(p.sortTables(d, p.checkIsNotChild), 'name');
@@ -434,7 +430,7 @@ describe('PostData', function () {
                     if (res[j].getRow().state !== dataRowState.added) {
                         continue;
                     }
-                    var posI = _.indexOf(parentFirst, res[i].tabRif),
+                    const posI = _.indexOf(parentFirst, res[i].tabRif),
                         posJ = _.indexOf(parentFirst, res[j].tabRif);
 
                     expect(posI >= 0).toBeTruthy();
@@ -449,7 +445,7 @@ describe('PostData', function () {
             d.tables.tab6.acceptChanges();
             d.tables.tab8.acceptChanges();
             d.tables.tab9.acceptChanges();
-            var i = 0;
+            let i = 0;
             d.tables.tab4.rows[0].getRow().acceptChanges();
             d.tables.tab4.rows[1].getRow().acceptChanges();
             d.tables.tab4.rows[4].getRow().acceptChanges();
@@ -479,8 +475,8 @@ describe('PostData', function () {
 
             d.tables['tab9'].rows[1].data9 = 'sayonara';
             d.tables['tab9'].rows[2].data9 = 'sayonara';
-            var j,
-                p = new PostData(),
+            let j;
+            const p = new PostData(),
                 res = p.changeList(d),
                 childFirst = _.map(p.sortTables(d, p.checkIsNotParent), 'name'),
                 parentFirst = _.map(p.sortTables(d, p.checkIsNotChild), 'name');
@@ -494,7 +490,7 @@ describe('PostData', function () {
                         continue;
                     }
 
-                    var posI = _.indexOf(childFirst, res[i].tabRif),
+                    const posI = _.indexOf(childFirst, res[i].tabRif),
                         posJ = _.indexOf(childFirst, res[j].tabRif);
 
                     expect(posI >= 0).toBeTruthy();
@@ -523,9 +519,9 @@ describe('PostData', function () {
 
                 d.tables.tab9.rows[1].data9 = 'sayonara';
                 d.tables.tab9.rows[2].data9 = 'sayonara';
-                var i = 0,
-                    j,
-                    p = new PostData(),
+                let i = 0,
+                    j;
+                const p = new PostData(),
                     res = p.changeList(d),
                     childFirst = _.map(p.sortTables(d, p.checkIsNotParent), 'name'),
                     parentFirst = _.map(p.sortTables(d, p.checkIsNotChild), 'name');
@@ -547,7 +543,7 @@ describe('PostData', function () {
     });
 
     describe('MaxCacher', function () {
-        var DAC, env;
+        let DAC, env;
         beforeEach(function (done) {
             DAC = undefined;
             env = new Environment();
@@ -563,18 +559,18 @@ describe('PostData', function () {
         });
 
         it('new MaxCacher(conn,environment) should return a class', function () {
-            var M = new MaxCacher(DAC, env);
+            const M = new MaxCacher(DAC, env);
             expect(M).toEqual(jasmine.any(MaxCacher));
         });
         it('getHash should return a string', function () {
-            var M = new MaxCacher(DAC, env);
+            const M = new MaxCacher(DAC, env);
             expect(M.getHash).toEqual(jasmine.any(Function));
             expect(M.getHash()).toEqual(jasmine.any(String));
         });
 
         it('getHash should return a string different if parameters are different', function () {
-            var M = new MaxCacher(DAC, env);
-            var table = 'operator',
+            const M = new MaxCacher(DAC, env);
+            const table = 'operator',
                 column = 'noperator',
                 filter = dq.eq('year', 2014),
                 expr = dq.max('noperator'),
@@ -594,8 +590,8 @@ describe('PostData', function () {
         });
 
         it('getMax should call conn.readSingleValue null when there is no selector', function (done) {
-            var M = new MaxCacher(DAC, env);
-            var table = 'operator',
+            const M = new MaxCacher(DAC, env);
+            const table = 'operator',
                 column = 'noperator',
                 filter = dq.eq('year', 2014),
                 expr = dq.max('noperator'),
@@ -603,7 +599,7 @@ describe('PostData', function () {
                 t = ds.newTable('operator'),
                 r = t.newRow({});
             spyOn(DAC, 'readSingleValue').andCallFake(function () {
-                var def = Deferred().resolve(1);
+                const def = Deferred().resolve(1);
                 return def.promise();
             });
             M.getMax(r, column, null, filter, expr)
@@ -620,17 +616,17 @@ describe('PostData', function () {
 
         it('getMax should not call conn.readSingleValue null when there is no selector the 2th time is called',
             function (done) {
-                var M = new MaxCacher(DAC, env);
-                var table = 'operator',
+                const M = new MaxCacher(DAC, env);
+                const table = 'operator',
                     column = 'noperator',
                     filter = dq.eq('year', 2014),
                     expr = dq.max('noperator'),
                     ds = new DataSet('d'),
                     t = ds.newTable('operator'),
-                    r = t.newRow({}),
-                    n = 0;
+                    r = t.newRow({});
+                let n = 0;
                 spyOn(DAC, 'readSingleValue').andCallFake(function () {
-                    var def = Deferred().resolve(++n);
+                    const def = Deferred().resolve(++n);
                     return def.promise();
                 });
                 M.getMax(r, column, null, filter, expr)
@@ -655,8 +651,8 @@ describe('PostData', function () {
             });
 
         it('getMax should call conn.readSingleValue  when there is selector but parent not added', function (done) {
-            var M = new MaxCacher(DAC, env);
-            var table = 'operator',
+            const M = new MaxCacher(DAC, env);
+            const table = 'operator',
                 column = 'noperator',
                 filter = dq.eq('year', 2014),
                 expr = dq.max('noperator'),
@@ -670,7 +666,7 @@ describe('PostData', function () {
             t.key(['idoperator', 'idparent']);
             ds.newRelation('r', 'parent', ['idparent'], 'operator', ['idparent']);
             spyOn(DAC, 'readSingleValue').andCallFake(function () {
-                var def = Deferred().resolve(1);
+                const def = Deferred().resolve(1);
                 return def.promise();
             });
             M.getMax(rChild, column, null, filter, expr)
@@ -686,14 +682,14 @@ describe('PostData', function () {
         });
 
         it('getMax SHOULD call relation.getParents  when there is selector but parent not added', function (done) {
-            var M = new MaxCacher(DAC, env);
-            var table = 'operator',
+            const M = new MaxCacher(DAC, env);
+            const table = 'operator',
                 column = 'noperator',
                 filter = dq.eq('year', 2014),
                 expr = dq.max('noperator'),
-                ds = new DataSet('d'),
-                rel,
-                parent = ds.newTable('parent'),
+                ds = new DataSet('d');
+            let rel;
+            const parent = ds.newTable('parent'),
                 t = ds.newTable('operator'),
                 rParent = parent.newRow({idparent: 1}),
                 rChild = t.newRow({idparent: 1});
@@ -703,7 +699,7 @@ describe('PostData', function () {
             rel = ds.newRelation('r', 'parent', ['idparent'], 'operator', ['idparent']);
             spyOn(rel, 'getParents').andCallThrough();
             spyOn(DAC, 'readSingleValue').andCallFake(function () {
-                var def = Deferred().resolve(1);
+                const def = Deferred().resolve(1);
                 return def.promise();
             });
             M.getMax(rChild, column, ['idparent'], filter, expr)
@@ -719,14 +715,14 @@ describe('PostData', function () {
 
         it('getMax SHOULD NOT call relation.getParents  when there is selector but parent not added - 2th call in a row',
             function (done) {
-                var M = new MaxCacher(DAC, env);
-                var table = 'operator',
+                const M = new MaxCacher(DAC, env);
+                const table = 'operator',
                     column = 'noperator',
                     filter = dq.eq('year', 2014),
                     expr = dq.max('noperator'),
-                    ds = new DataSet('d'),
-                    rel,
-                    parent = ds.newTable('parent'),
+                    ds = new DataSet('d');
+                let rel;
+                const parent = ds.newTable('parent'),
                     t = ds.newTable('operator'),
                     rParent = parent.newRow({idparent: 1}),
                     rChild = t.newRow({idparent: 1});
@@ -736,7 +732,7 @@ describe('PostData', function () {
                 rel = ds.newRelation('r', 'parent', ['idparent'], 'operator', ['idparent']);
                 spyOn(rel, 'getParents').andCallThrough();
                 spyOn(DAC, 'readSingleValue').andCallFake(function () {
-                    var def = Deferred().resolve(1);
+                    const def = Deferred().resolve(1);
                     return def.promise();
                 });
                 M.getMax(rChild, column, ['idparent'], filter, expr)
@@ -762,14 +758,14 @@ describe('PostData', function () {
         it('getMax should NOT call conn.readSingleValue  when there is selector and parent ' +
             'is added and autoincrement',
             function (done) {
-                var M = new MaxCacher(DAC, env);
-                var table = 'operator',
+                const M = new MaxCacher(DAC, env);
+                const table = 'operator',
                     column = 'noperator',
                     filter = dq.eq('year', 2014),
                     expr = dq.max('noperator'),
-                    ds = new DataSet('d'),
-                    rel,
-                    parent = ds.newTable('parent'),
+                    ds = new DataSet('d');
+                let rel;
+                const parent = ds.newTable('parent'),
                     t = ds.newTable('operator'),
                     rParent = parent.newRow({idparent: 1}),
                     rChild = t.newRow({idparent: 1});
@@ -778,9 +774,9 @@ describe('PostData', function () {
                 parent.autoIncrement('idparent', {});
                 //t.autoIncrement('noperator', {selector:['idparent']}); //not necessary for the test
                 rel = ds.newRelation('r', 'parent', ['idparent'], 'operator', ['idparent']);
-                var parRel = rel.getParentsFilter(rChild);
+                const parRel = rel.getParentsFilter(rChild);
                 spyOn(DAC, 'readSingleValue').andCallFake(function () {
-                    var def = Deferred().resolve(1);
+                    const def = Deferred().resolve(1);
                     return def.promise();
                 });
                 M.getMax(rChild, column, ['idparent'], filter, expr)
@@ -799,14 +795,14 @@ describe('PostData', function () {
         it('getMax SHOULD call conn.readSingleValue  when there is selector and parent ' +
             'is added but NOT autoincrement',
             function (done) {
-                var M = new MaxCacher(DAC, env);
-                var table = 'operator',
+                const M = new MaxCacher(DAC, env);
+                const table = 'operator',
                     column = 'noperator',
                     filter = dq.eq('year', 2014),
                     expr = dq.max('noperator'),
-                    ds = new DataSet('d'),
-                    rel,
-                    parent = ds.newTable('parent'),
+                    ds = new DataSet('d');
+                let rel;
+                const parent = ds.newTable('parent'),
                     t = ds.newTable('operator'),
                     rParent = parent.newRow({idparent: 1}),
                     rChild = t.newRow({idparent: 1});
@@ -815,9 +811,9 @@ describe('PostData', function () {
                 //parent.autoIncrement('idparent', {});
                 //t.autoIncrement('noperator', {selector:['idparent']}); //not necessary for the test
                 rel = ds.newRelation('r', 'parent', ['idparent'], 'operator', ['idparent']);
-                var parRel = rel.getParentsFilter(rChild);
+                const parRel = rel.getParentsFilter(rChild);
                 spyOn(DAC, 'readSingleValue').andCallFake(function () {
-                    var def = Deferred().resolve(100);
+                    const def = Deferred().resolve(100);
                     return def.promise();
                 });
                 M.getMax(rChild, column, ['idparent'], filter, expr)
@@ -835,14 +831,14 @@ describe('PostData', function () {
         it('getMax SHOULD call conn.readSingleValue  when there is selector and parent ' +
             'is autoincrement but NOT added',
             function (done) {
-                var M = new MaxCacher(DAC, env);
-                var table = 'operator',
+                const M = new MaxCacher(DAC, env);
+                const table = 'operator',
                     column = 'noperator',
                     filter = dq.eq('year', 2014),
                     expr = dq.max('noperator'),
-                    ds = new DataSet('d'),
-                    rel,
-                    parent = ds.newTable('parent'),
+                    ds = new DataSet('d');
+                let rel;
+                const parent = ds.newTable('parent'),
                     t = ds.newTable('operator'),
                     rParent = parent.newRow({idparent: 1}),
                     rChild = t.newRow({idparent: 1});
@@ -852,9 +848,9 @@ describe('PostData', function () {
                 parent.autoIncrement('idparent', {});
                 //t.autoIncrement('noperator', {selector:['idparent']}); //not necessary for the test
                 rel = ds.newRelation('r', 'parent', ['idparent'], 'operator', ['idparent']);
-                var parRel = rel.getParentsFilter(rChild);
+                const parRel = rel.getParentsFilter(rChild);
                 spyOn(DAC, 'readSingleValue').andCallFake(function () {
-                    var def = Deferred().resolve(100);
+                    const def = Deferred().resolve(100);
                     return def.promise();
                 });
                 M.getMax(rChild, column, ['idparent'], filter, expr)
@@ -871,15 +867,15 @@ describe('PostData', function () {
     });
 
     describe('doPost', function () {
-        var DAC,
+        let DAC,
             env,
             postData,
             d,
             changes;
 
         beforeEach(function (done) {
-            var rowCount, row, i, t,
-                d = new DataSet('d');
+            let rowCount, row, i, t;
+            const d = new DataSet('d');
 
             i = 11;
             while (--i > 0) {
@@ -940,9 +936,9 @@ describe('PostData', function () {
         });
 
         it('should call opt.callChecks when there is something to save', function (done) {
-            var opt = {
+            const opt = {
                 getChecks: function () {
-                    var def = Deferred(),
+                    const def = Deferred(),
                         res = {checks: [], shouldContinue: true};
                     def.resolve(res);
                     return def.promise();
@@ -962,18 +958,18 @@ describe('PostData', function () {
 
         it('should append error got from callChecks to output errors', function (done) {
 
-            var errNum = 12,
-                opt = {
-                    getChecks: function (post) {
-                        var def = Deferred(),
-                            res = {checks: [{code: errNum}], shouldContinue: false};
-                        errNum += 1;
-                        def.resolve(res);
-                        //console.log('returning checks:'+res);
-                        return def.promise();
-                    },
-                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
-                };
+            let errNum = 12;
+            const opt = {
+                getChecks: function (post) {
+                    const def = Deferred(),
+                        res = {checks: [{code: errNum}], shouldContinue: false};
+                    errNum += 1;
+                    def.resolve(res);
+                    //console.log('returning checks:'+res);
+                    return def.promise();
+                },
+                optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
+            };
             spyOn(opt, 'getChecks').andCallThrough();
 
             postData.doPost(changes, opt)
@@ -986,21 +982,21 @@ describe('PostData', function () {
 
         it('should NOT call open and begin transaction if precheck returned shouldContinue is false', function (done) {
 
-            var errNum = 12,
-                opt = {
-                    getChecks: function (post) {
-                        var def = Deferred(),
-                            res = {
-                                checks: [
-                                    {code: errNum}
-                                ], shouldContinue: false
-                            };
-                        errNum += 1;
-                        def.resolve(res);
-                        return def.promise();
-                    },
-                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
-                };
+            let errNum = 12;
+            const opt = {
+                getChecks: function (post) {
+                    const def = Deferred(),
+                        res = {
+                            checks: [
+                                {code: errNum}
+                            ], shouldContinue: false
+                        };
+                    errNum += 1;
+                    def.resolve(res);
+                    return def.promise();
+                },
+                optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
+            };
             spyOn(DAC, 'open').andCallThrough();
             spyOn(DAC, 'beginTransaction').andCallThrough();
 
@@ -1016,21 +1012,21 @@ describe('PostData', function () {
 
         it('should call open and beginTransaction if prechecks returned shouldContinue is true', function (done) {
 
-            var errNum = 12,
-                opt = {
-                    getChecks: function (post) {
-                        var def = Deferred(),
-                            res = {
-                                checks: [
-                                    {code: errNum}
-                                ], shouldContinue: true
-                            };
-                        errNum += 1;
-                        def.resolve(res);
-                        return def.promise();
-                    },
-                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
-                };
+            let errNum = 12;
+            const opt = {
+                getChecks: function (post) {
+                    const def = Deferred(),
+                        res = {
+                            checks: [
+                                {code: errNum}
+                            ], shouldContinue: true
+                        };
+                    errNum += 1;
+                    def.resolve(res);
+                    return def.promise();
+                },
+                optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
+            };
             spyOn(DAC, 'open').andCallThrough();
             spyOn(DAC, 'beginTransaction').andCallThrough();
 
@@ -1049,24 +1045,24 @@ describe('PostData', function () {
 
         it('should call physicalPostBatch if prechecks returned shouldContinue is true', function (done) {
 
-            var errNum = 12,
-                opt = {
-                    getChecks: function (post) {
-                        var def = Deferred(),
-                            res = {
-                                checks: [
-                                    {code: errNum, post: post}
-                                ], shouldContinue: true
-                            };
-                        errNum += 1;
-                        def.resolve(res);
-                        return def.promise();
-                    },
-                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
-                };
+            let errNum = 12;
+            const opt = {
+                getChecks: function (post) {
+                    const def = Deferred(),
+                        res = {
+                            checks: [
+                                {code: errNum, post: post}
+                            ], shouldContinue: true
+                        };
+                    errNum += 1;
+                    def.resolve(res);
+                    return def.promise();
+                },
+                optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
+            };
 
             spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve();
                 return def.promise();
             });
@@ -1085,29 +1081,29 @@ describe('PostData', function () {
 
         it('should call opt.log if physicalPostBatch is resolved and opt.log is given', function (done) {
 
-            var errNum = 12,
-                opt = {
-                    getChecks: function (post) {
-                        var def = Deferred(),
-                            res = {
-                                checks: [
-                                    {code: errNum, post: post}
-                                ], shouldContinue: true
-                            };
-                        errNum += 1;
-                        def.resolve(res);
-                        return def.promise();
-                    },
-                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
-                    log: function (conn, changes) {
-                        var def = Deferred();
-                        def.resolve();
-                        return def.promise();
-                    }
-                };
+            let errNum = 12;
+            const opt = {
+                getChecks: function (post) {
+                    const def = Deferred(),
+                        res = {
+                            checks: [
+                                {code: errNum, post: post}
+                            ], shouldContinue: true
+                        };
+                    errNum += 1;
+                    def.resolve(res);
+                    return def.promise();
+                },
+                optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
+                log: function (conn, changes) {
+                    const def = Deferred();
+                    def.resolve();
+                    return def.promise();
+                }
+            };
 
             spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve();
                 return def.promise();
             });
@@ -1128,29 +1124,29 @@ describe('PostData', function () {
 
         it('should not call getChecks(post) if given opt.log reject his promise', function (done) {
 
-            var errNum = 12,
-                opt = {
-                    getChecks: function (post) {
-                        var def = Deferred(),
-                            res = {
-                                checks: [
-                                    {code: errNum, post: post}
-                                ], shouldContinue: true
-                            };
-                        errNum += 1;
-                        def.resolve(res);
-                        return def.promise();
-                    },
-                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
-                    log: function (conn, changes) {
-                        var def = Deferred();
-                        def.reject('log reject');
-                        return def.promise();
-                    }
-                };
+            let errNum = 12;
+            const opt = {
+                getChecks: function (post) {
+                    const def = Deferred(),
+                        res = {
+                            checks: [
+                                {code: errNum, post: post}
+                            ], shouldContinue: true
+                        };
+                    errNum += 1;
+                    def.resolve(res);
+                    return def.promise();
+                },
+                optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
+                log: function (conn, changes) {
+                    const def = Deferred();
+                    def.reject('log reject');
+                    return def.promise();
+                }
+            };
 
             spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve();
                 return def.promise();
             });
@@ -1173,24 +1169,24 @@ describe('PostData', function () {
 
         it('should call postChecks if physicalPostBatch is resolved', function (done) {
 
-            var errNum = 12,
-                opt = {
-                    getChecks: function (post) {
-                        var def = Deferred(),
-                            res = {
-                                checks: [
-                                    {code: errNum, post: post}
-                                ], shouldContinue: true
-                            };
-                        errNum += 1;
-                        def.resolve(res);
-                        return def.promise();
-                    },
-                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
-                };
+            let errNum = 12;
+            const opt = {
+                getChecks: function (post) {
+                    const def = Deferred(),
+                        res = {
+                            checks: [
+                                {code: errNum, post: post}
+                            ], shouldContinue: true
+                        };
+                    errNum += 1;
+                    def.resolve(res);
+                    return def.promise();
+                },
+                optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
+            };
 
             spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve();
                 return def.promise();
             });
@@ -1214,24 +1210,24 @@ describe('PostData', function () {
 
         it('should NOT call postChecks if physicalPostBatch is rejected', function (done) {
 
-            var errNum = 12,
-                opt = {
-                    getChecks: function (post) {
-                        var def = Deferred(),
-                            res = {
-                                checks: [
-                                    {code: errNum, post: post}
-                                ], shouldContinue: true
-                            };
-                        errNum += 1;
-                        def.resolve(res);
-                        return def.promise();
-                    },
-                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
-                };
+            let errNum = 12;
+            const opt = {
+                getChecks: function (post) {
+                    const def = Deferred(),
+                        res = {
+                            checks: [
+                                {code: errNum, post: post}
+                            ], shouldContinue: true
+                        };
+                    errNum += 1;
+                    def.resolve(res);
+                    return def.promise();
+                },
+                optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu'])
+            };
 
             spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.reject('physicalPostBatch fake error');
                 return def.promise();
             });
@@ -1258,29 +1254,29 @@ describe('PostData', function () {
         it('should NOT call opt.doUpdate if physicalPostBatch is resolved and opt.doUpdate is given and there are checks',
             function (done) {
 
-                var errNum = 12,
-                    opt = {
-                        getChecks: function (post) {
-                            var def = Deferred(),
-                                res = {
-                                    checks: [
-                                        {code: errNum, post: post}
-                                    ], shouldContinue: true
-                                };
-                            errNum += 1;
-                            def.resolve(res);
-                            return def.promise();
-                        },
-                        optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
-                        doUpdate: function () {
-                            var def = Deferred();
-                            def.resolve();
-                            return def.promise();
-                        }
-                    };
+                let errNum = 12;
+                const opt = {
+                    getChecks: function (post) {
+                        const def = Deferred(),
+                            res = {
+                                checks: [
+                                    {code: errNum, post: post}
+                                ], shouldContinue: true
+                            };
+                        errNum += 1;
+                        def.resolve(res);
+                        return def.promise();
+                    },
+                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
+                    doUpdate: function () {
+                        const def = Deferred();
+                        def.resolve();
+                        return def.promise();
+                    }
+                };
 
                 spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                    var def = Deferred();
+                    const def = Deferred();
                     def.resolve();
                     return def.promise();
                 });
@@ -1302,28 +1298,28 @@ describe('PostData', function () {
         it('should  call opt.doUpdate if physicalPostBatch is resolved and opt.doUpdate is given and there are no checks',
             function (done) {
 
-                var errNum = 12,
-                    opt = {
-                        getChecks: function (post) {
-                            var def = Deferred(),
-                                res = {
-                                    checks: [], //[{code: errNum, post: post}],
-                                    shouldContinue: true
-                                };
-                            errNum += 1;
-                            def.resolve(res);
-                            return def.promise();
-                        },
-                        optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
-                        doUpdate: function () {
-                            var def = Deferred();
-                            def.resolve({checks: []});
-                            return def.promise();
-                        }
-                    };
+                let errNum = 12;
+                const opt = {
+                    getChecks: function (post) {
+                        const def = Deferred(),
+                            res = {
+                                checks: [], //[{code: errNum, post: post}],
+                                shouldContinue: true
+                            };
+                        errNum += 1;
+                        def.resolve(res);
+                        return def.promise();
+                    },
+                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
+                    doUpdate: function () {
+                        const def = Deferred();
+                        def.resolve({checks: []});
+                        return def.promise();
+                    }
+                };
 
                 spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                    var def = Deferred();
+                    const def = Deferred();
                     def.resolve();
                     return def.promise();
                 });
@@ -1346,28 +1342,28 @@ describe('PostData', function () {
         it('should  call commit if optional doUpdate resolves',
             function (done) {
 
-                var errNum = 12,
-                    opt = {
-                        getChecks: function (post) {
-                            var def = Deferred(),
-                                res = {
-                                    checks: [], //[{code: errNum, post: post}],
-                                    shouldContinue: true
-                                };
-                            errNum += 1;
-                            def.resolve(res);
-                            return def.promise();
-                        },
-                        optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
-                        doUpdate: function () {
-                            var def = Deferred();
-                            def.resolve({checks: []});
-                            return def.promise();
-                        }
-                    };
+                let errNum = 12;
+                const opt = {
+                    getChecks: function (post) {
+                        const def = Deferred(),
+                            res = {
+                                checks: [], //[{code: errNum, post: post}],
+                                shouldContinue: true
+                            };
+                        errNum += 1;
+                        def.resolve(res);
+                        return def.promise();
+                    },
+                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
+                    doUpdate: function () {
+                        const def = Deferred();
+                        def.resolve({checks: []});
+                        return def.promise();
+                    }
+                };
 
                 spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                    var def = Deferred();
+                    const def = Deferred();
                     def.resolve();
                     return def.promise();
                 });
@@ -1390,28 +1386,28 @@ describe('PostData', function () {
         it('should  call rollBack (and not commit) if optional doUpdate is rejected',
             function (done) {
 
-                var errNum = 12,
-                    opt = {
-                        getChecks: function (post) {
-                            var def = Deferred(),
-                                res = {
-                                    checks: [], //[{code: errNum, post: post}],
-                                    shouldContinue: true
-                                };
-                            errNum += 1;
-                            def.resolve(res);
-                            return def.promise();
-                        },
-                        optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
-                        doUpdate: function () {
-                            var def = Deferred();
-                            def.reject('another doUpdate fake error');
-                            return def.promise();
-                        }
-                    };
+                let errNum = 12;
+                const opt = {
+                    getChecks: function (post) {
+                        const def = Deferred(),
+                            res = {
+                                checks: [], //[{code: errNum, post: post}],
+                                shouldContinue: true
+                            };
+                        errNum += 1;
+                        def.resolve(res);
+                        return def.promise();
+                    },
+                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
+                    doUpdate: function () {
+                        const def = Deferred();
+                        def.reject('another doUpdate fake error');
+                        return def.promise();
+                    }
+                };
 
                 spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                    var def = Deferred();
+                    const def = Deferred();
                     def.resolve();
                     return def.promise();
                 });
@@ -1437,28 +1433,28 @@ describe('PostData', function () {
         it('should  call rollBack (and not commit) if physicalPostBatch is rejected',
             function (done) {
 
-                var errNum = 12,
-                    opt = {
-                        getChecks: function (post) {
-                            var def = Deferred(),
-                                res = {
-                                    checks: [], //[{code: errNum, post: post}],
-                                    shouldContinue: true
-                                };
-                            errNum += 1;
-                            def.resolve(res);
-                            return def.promise();
-                        },
-                        optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
-                        doUpdate: function () {
-                            var def = Deferred();
-                            def.resolve();
-                            return def.promise();
-                        }
-                    };
+                let errNum = 12;
+                const opt = {
+                    getChecks: function (post) {
+                        const def = Deferred(),
+                            res = {
+                                checks: [], //[{code: errNum, post: post}],
+                                shouldContinue: true
+                            };
+                        errNum += 1;
+                        def.resolve(res);
+                        return def.promise();
+                    },
+                    optimisticLocking: new OptimisticLocking(['lt', 'lu'], ['ct', 'cu', 'lt', 'lu']),
+                    doUpdate: function () {
+                        const def = Deferred();
+                        def.resolve();
+                        return def.promise();
+                    }
+                };
 
                 spyOn(postData, 'physicalPostBatch').andCallFake(function () {
-                    var def = Deferred();
+                    const def = Deferred();
                     def.reject('physicalPostBatch fake error');
                     return def.promise();
                 });
@@ -1484,7 +1480,7 @@ describe('PostData', function () {
     });
 
     describe('getSqlStatements', function () {
-        var DAC,
+        let DAC,
             env,
             conn,
             postData,
@@ -1493,8 +1489,8 @@ describe('PostData', function () {
             changes;
 
         beforeEach(function (done) {
-            var rowCount, row, i, t,
-                d = new DataSet('d');
+            let rowCount, row, i, t;
+            const d = new DataSet('d');
 
             i = 11;
             while (--i > 0) {
@@ -1546,12 +1542,12 @@ describe('PostData', function () {
 
         it('should call calcAllAutoId for every given row', function (done) {
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(false);
                 return def.promise();
             });
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1564,13 +1560,13 @@ describe('PostData', function () {
         });
 
         it('should call calcAllAutoId one at a time', function (done) {
-            var overlap = false, isIn = false;
+            let overlap = false, isIn = false;
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
                 if (isIn) {
                     overlap = true;
                 }
                 isIn = true;
-                var def = Deferred();
+                const def = Deferred();
                 process.nextTick(function () {
                     isIn = false;
                     def.resolve(false);
@@ -1579,7 +1575,7 @@ describe('PostData', function () {
                 return def.promise();
             });
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1593,12 +1589,12 @@ describe('PostData', function () {
         });
 
         it('if calcAllAutoId one does fail, should reject request and stop', function (done) {
-            var overlap = false, isIn = false, nRows = 0;
+            let overlap = false, isIn = false, nRows = 0;
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
                 if (isIn) {
                     overlap = true;
                 }
-                var def = Deferred();
+                const def = Deferred();
                 if (nRows === 5) {
                     def.reject('some reasons');
                     return def.promise();
@@ -1613,7 +1609,7 @@ describe('PostData', function () {
                 return def.promise();
             });
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1632,9 +1628,9 @@ describe('PostData', function () {
 
 
         it('should call DAC.getPostCommand and giveErrorNumberDataWasNotWritten for every given row', function (done) {
-            var countCommands = 0;
+            let countCommands = 0;
             spyOn(DAC, 'getPostCommand').andCallFake(function (row, locking, env) {
-                var def = Deferred();
+                const def = Deferred();
                 countCommands += 1;
                 def.resolve('fake sql' + countCommands);
                 return def.promise();
@@ -1642,7 +1638,7 @@ describe('PostData', function () {
             spyOn(conn, 'giveErrorNumberDataWasNotWritten').andCallThrough();
 
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1659,18 +1655,18 @@ describe('PostData', function () {
         });
 
         it('should call appendCommands for every given row ', function (done) {
-            var nRows = 0;
-            var countCommands = 0;
+            let nRows = 0;
+            let countCommands = 0;
             spyOn(DAC, 'getPostCommand').andCallFake(function (row, locking, env) {
-                var def = Deferred();
+                const def = Deferred();
                 countCommands += 1;
-                var sql = 'fake sql' + countCommands;
+                const sql = 'fake sql' + countCommands;
                 def.resolve(sql);
                 return def.promise();
             });
             spyOn(conn, 'appendCommands').andCallThrough();
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
-                var def = Deferred();
+                const def = Deferred();
                 process.nextTick(function () {
                     nRows += 1;
                     def.resolve(false);
@@ -1680,7 +1676,7 @@ describe('PostData', function () {
             });
 
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = new Deferred();
+                const def = new Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1697,19 +1693,19 @@ describe('PostData', function () {
         });
 
         it('should call appendCommands for every given row  (all single sql commands)', function (done) {
-            var nRows = 0;
-            var countCommands = 0;
-            var expectedSql = [],
+            let nRows = 0;
+            let countCommands = 0;
+            const expectedSql = [],
                 results = [];
             spyOn(DAC, 'getPostCommand').andCallFake(function (row, locking, env) {
                 countCommands += 1;
-                var sql = 'fake sql' + countCommands;
+                const sql = 'fake sql' + countCommands;
                 expectedSql.push(sql);
                 return sql;
             });
             spyOn(conn, 'appendCommands').andCallThrough();
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
-                var def = Deferred();
+                const def = Deferred();
                 process.nextTick(function () {
                     nRows += 1;
                     def.resolve(true);
@@ -1719,7 +1715,7 @@ describe('PostData', function () {
             });
 
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1746,19 +1742,19 @@ describe('PostData', function () {
         });
 
         it('should call appendCommands for every given row (grouped sql commands)', function (done) {
-            var nRows = 0;
-            var countCommands = 0;
-            var expectedSql = [],
+            let nRows = 0;
+            let countCommands = 0;
+            const expectedSql = [],
                 results = [];
             spyOn(DAC, 'getPostCommand').andCallFake(function (row, locking, env) {
                 countCommands += 1;
-                var sql = 'fake sql' + countCommands;
+                const sql = 'fake sql' + countCommands;
                 expectedSql.push(sql);
                 return sql;
             });
             spyOn(conn, 'appendCommands').andCallThrough();
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
-                var def = Deferred();
+                const def = Deferred();
                 process.nextTick(function () {
                     nRows += 1;
                     def.resolve(false);
@@ -1768,7 +1764,7 @@ describe('PostData', function () {
             });
 
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1797,7 +1793,7 @@ describe('PostData', function () {
     });
 
     describe('physicalPostBatch', function () {
-        var DAC, conn,
+        let DAC, conn,
             env,
             postData,
             d,
@@ -1805,8 +1801,8 @@ describe('PostData', function () {
             changes;
 
         beforeEach(function (done) {
-            var rowCount, row, i, t,
-                d = new DataSet('d');
+            let rowCount, row, i, t;
+            const d = new DataSet('d');
 
             i = 11;
             while (--i > 0) {
@@ -1857,7 +1853,7 @@ describe('PostData', function () {
         it('should call getSqlStatements', function (done) {
             spyOn(postData, 'getSqlStatements').andCallThrough();
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1870,7 +1866,7 @@ describe('PostData', function () {
 
         it('should call runCmd', function (done) {
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 def.resolve(-1);
                 return def.promise();
             });
@@ -1883,19 +1879,19 @@ describe('PostData', function () {
 
 
         it('if runCmd fails then physicalPostBatch should fail too', function (done) {
-            var nRows = 0;
-            var countCommands = 0;
-            var expectedSql = [],
+            let nRows = 0;
+            let countCommands = 0;
+            const expectedSql = [],
                 results = [];
             spyOn(DAC, 'getPostCommand').andCallFake(function (row, locking, env) {
                 countCommands += 1;
-                var sql = 'fake sql' + countCommands;
+                const sql = 'fake sql' + countCommands;
                 expectedSql.push(sql);
                 return sql;
             });
             spyOn(conn, 'appendCommands').andCallThrough();
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
-                var def = Deferred();
+                const def = Deferred();
                 process.nextTick(function () {
                     nRows += 1;
                     def.resolve(false);
@@ -1904,9 +1900,9 @@ describe('PostData', function () {
                 return def.promise();
             });
 
-            var nOk = 0;
+            let nOk = 0;
             spyOn(DAC, 'runCmd').andCallFake(function (sqlComplete) {
-                var def = Deferred();
+                const def = Deferred();
                 nOk += 1;
                 if (nOk < 50) {
                     def.resolve(-1);
@@ -1929,19 +1925,19 @@ describe('PostData', function () {
 
 
         it('if runCmd resolves into a bad number, an internal error should be raised', function (done) {
-            var nRows = 0;
-            var countCommands = 0;
-            var expectedSql = [],
+            let nRows = 0;
+            let countCommands = 0;
+            const expectedSql = [],
                 results = [];
             spyOn(DAC, 'getPostCommand').andCallFake(function (row, locking, env) {
                 countCommands += 1;
-                var sql = 'fake sql' + countCommands;
+                const sql = 'fake sql' + countCommands;
                 expectedSql.push(sql);
                 return sql;
             });
             spyOn(conn, 'appendCommands').andCallThrough();
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
-                var def = Deferred();
+                const def = Deferred();
                 process.nextTick(function () {
                     nRows += 1;
                     def.resolve(false);
@@ -1950,9 +1946,9 @@ describe('PostData', function () {
                 return def.promise();
             });
 
-            var nOk = 0;
+            let nOk = 0;
             spyOn(DAC, 'runCmd').andCallFake(function () {
-                var def = Deferred();
+                const def = Deferred();
                 nOk += 1;
                 if (nOk < 50) {
                     def.resolve(-1);
@@ -1975,19 +1971,19 @@ describe('PostData', function () {
 
 
         it('runCmd should be called with every sql cmd got from getPostCommand (grouped)', function (done) {
-            var nRows = 0;
-            var countCommands = 0;
-            var expectedSql = [],
+            let nRows = 0;
+            let countCommands = 0;
+            const expectedSql = [],
                 runnedSql = [];
             spyOn(DAC, 'getPostCommand').andCallFake(function (row, locking, env) {
                 countCommands += 1;
-                var sql = 'fake sql >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' + countCommands;
+                const sql = 'fake sql >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' + countCommands;
                 expectedSql.push(sql);
                 return sql;
             });
             spyOn(conn, 'appendCommands').andCallThrough();
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
-                var def = Deferred();
+                const def = Deferred();
                 process.nextTick(function () {
                     nRows += 1;
                     def.resolve(true);
@@ -1996,9 +1992,9 @@ describe('PostData', function () {
                 return def.promise();
             });
 
-            var nOk = 0;
+            let nOk = 0;
             spyOn(DAC, 'runCmd').andCallFake(function (sqlComplete) {
-                var def = Deferred();
+                const def = Deferred();
                 nOk += 1;
                 runnedSql.push(sqlComplete);
                 def.resolve(-1);
@@ -2021,19 +2017,19 @@ describe('PostData', function () {
         });
 
         it('runCmd should be called with every sql cmd got from getPostCommand (single)', function (done) {
-            var nRows = 0;
-            var countCommands = 0;
-            var expectedSql = [],
+            let nRows = 0;
+            let countCommands = 0;
+            const expectedSql = [],
                 runnedSql = [];
             spyOn(DAC, 'getPostCommand').andCallFake(function () {  //row, locking, env
                 countCommands += 1;
-                var sql = 'fake sql >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' + countCommands;
+                const sql = 'fake sql >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' + countCommands;
                 expectedSql.push(sql);
                 return sql;
             });
             spyOn(conn, 'appendCommands').andCallThrough();
             spyOn(postData, 'calcAllAutoId').andCallFake(function (r) {
-                var def = Deferred();
+                const def = Deferred();
                 process.nextTick(function () {
                     nRows += 1;
                     def.resolve(false);
@@ -2042,9 +2038,9 @@ describe('PostData', function () {
                 return def.promise();
             });
 
-            var nOk = 0;
+            let nOk = 0;
             spyOn(DAC, 'runCmd').andCallFake(function (sqlComplete) {
-                var def = Deferred();
+                const def = Deferred();
                 nOk += 1;
                 runnedSql.push(sqlComplete);
                 def.resolve(-1);
@@ -2070,7 +2066,7 @@ describe('PostData', function () {
 
 
     describe('getSelectAllViews', function () {
-        var DAC,
+        let DAC,
             env,
             conn,
             postData,
@@ -2079,7 +2075,7 @@ describe('PostData', function () {
             changes;
 
         beforeEach(function (done) {
-            var rowCount, row, i, t;
+            let rowCount, row, i, t;
             d = new DataSet('d');
 
             i = 11;
@@ -2155,7 +2151,7 @@ describe('PostData', function () {
 
 describe('destroy dataBase', function () {
 'use strict';
-    var sqlConn;
+    let sqlConn;
     beforeEach(function (done) {
         dbList.setDbInfo('test', good);
         sqlConn = dbList.getConnection('test');
