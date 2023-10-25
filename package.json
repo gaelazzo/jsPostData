@@ -10,7 +10,7 @@
     "node": ">= 0.6"
   },
   "dependencies": {
-    "lodash": "4.17.15",
+    "lodash": "4.17.21",
     "async": "~1.4.0",
     "jsEncryptedFile": "https://github.com/gaelazzo/jsEncryptedFile",
     "jsDataAccess": "https://github.com/gaelazzo/jsDataAccess",
